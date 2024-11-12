@@ -1,24 +1,11 @@
-'use client';
-import { useEffect, useState } from 'react';
-import fetchDatabase from './lib/api';
+import Home from './pages/home';
 
-export default function Page() {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetchDatabase();
-      setData(data);
-    };
-
-    setTimeout(() => {
-      fetchData();
-    }, 1000);
-  }, []);
-
+const Page: React.FC = () => {
   return (
-    <div>
-      {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : <p>Loading...</p>}
+    <div className="my-20">
+      <Home />
     </div>
   );
-}
+};
+
+export default Page;
