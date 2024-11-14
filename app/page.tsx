@@ -5,7 +5,12 @@ import getCategories from './lib/filter';
 
 export default function Page() {
   const [data, setData] = useState(null);
-  const [categories, setCategories] = useState(null);
+  interface Category {
+    id: number;
+    name: string;
+  }
+
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,6 +28,7 @@ export default function Page() {
       if (data) {
         const categories = await getCategories();
         setCategories(categories);
+        console.log('cotegorie :', categories);
       }
     };
 
@@ -31,17 +37,19 @@ export default function Page() {
 
   return (
     <div>
-      {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : <p>Loading...</p>}
-      {categories ? (
-        <ul>
-          {categories.map(category => (
-            <li key={category.id}>{category.name}</li>
-          ))}
-        </ul>
+      {/* {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : <p>Loading...</p>} */}
+      {categories.length > 0 ? (
+        <div>
+          <h1>Categories</h1>
+          <ul>
+            {categories.map(category => (
+              <li key={category.id}>{category.name}</li>
+            ))}
+          </ul>
+        </div>
       ) : (
         <p>Loading categories...</p>
       )}
     </div>
   );
-
 }
