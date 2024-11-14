@@ -9,7 +9,7 @@ export const getQuizQuestions = async (
   const data = await fetchDatabase();
 
   if (data) {
-    const questions: Question[] = data.results;
+    const questions: Question[] = data;
     res.status(200).json(questions);
   } else {
     res
