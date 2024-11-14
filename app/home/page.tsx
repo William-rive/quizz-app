@@ -1,3 +1,4 @@
+'use client';
 import Link from 'next/link';
 import { Button } from '../components/ui/button';
 
@@ -11,6 +12,16 @@ const Home: React.FC = () => {
         classement !
         <br />
         Êtes-vous prêt à relever le défi ?
+      </p>
+      <span className="text-xl mt-5 text-primary">Règles du jeu : </span>
+      <p className="text-xl text-center">
+        Le quiz est composé de 10 questions.
+        <br />
+        Vous avez 10 secondes pour répondre à chaque question.
+        <br />
+        Vous gagnez des points en fonction de la rapidité de votre réponse.
+        <br />
+        Bonne chance !
       </p>
       <Button className="mt-8">
         <Link href="/start"> Start Quiz</Link>

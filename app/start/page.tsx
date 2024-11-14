@@ -1,4 +1,3 @@
-// page.tsx
 'use client';
 import React, { useEffect, useState } from 'react';
 import QuestionCard from '../components/QuestionCard';
@@ -11,9 +10,8 @@ const Start: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleNextQuestion = () => {
-    setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % questions.length);
+    setCurrentQuestionIndex(prevIndex => (prevIndex + 1) % questions.length);
   };
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,7 +39,6 @@ const Start: React.FC = () => {
 
   return (
     <div>
-      <h1>Commencez le Quiz</h1>
       {error ? (
         <p>{error}</p>
       ) : (
