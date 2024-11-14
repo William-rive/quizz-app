@@ -1,41 +1,46 @@
+// page.tsx
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import QuestionCard from '../components/QuestionCard';
+import fetchDatabase from '../lib/api';
+import { Question, getAllAnswers } from '../model/question';
 
 const Start: React.FC = () => {
-  const [category, setCategory] = useState<string>('');
-  const [difficulty, setDifficulty] = useState<string>('');
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleStartQuiz = () => {
-    console.log(`Category: ${category}, Difficulty: ${difficulty}`);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchDatabase();
+        if (data.length === 0) {
+          setError(
+            'Impossible de récupérer les questions. Veuillez réessayer plus tard.',
+          );
+        } else {
+          const filteredData = data.map((item: Question) => ({
+            ...item,
+            reponses: getAllAnswers(item),
+          }));
+          setQuestions(filteredData);
+        }
+      } catch (err) {
+        console.error(err);
+        setError('Erreur lors de la récupération des données.');
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div>
-      <div>
-        <label htmlFor="category">Choose a category:</label>
-        <select
-          id="category"
-          value={category}
-          onChange={e => setCategory(e.target.value)}>
-          <option value="">Select a category</option>
-          <option value="general">General Knowledge</option>
-          <option value="science">Science</option>
-          <option value="history">History</option>
-        </select>
-      </div>
-      <div>
-        <label htmlFor="difficulty">Choose a difficulty:</label>
-        <select
-          id="difficulty"
-          value={difficulty}
-          onChange={e => setDifficulty(e.target.value)}>
-          <option value="">Select a difficulty</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-      </div>
-      <button onClick={handleStartQuiz}>Start Quiz</button>
+      <h1>Commencez le Quiz</h1>
+      {error ? (
+        <p>{error}</p>
+      ) : (
+        questions.map((q, index) => <QuestionCard key={index} question={q} />)
+      )}
     </div>
   );
 };
