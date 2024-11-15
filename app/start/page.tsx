@@ -13,6 +13,12 @@ const Start: React.FC = () => {
     setCurrentQuestionIndex(prevIndex => (prevIndex + 1) % questions.length);
   };
 
+  const handleTimeUp = () => {
+    setTimeout(() => {
+      handleNextQuestion(); // Passe à la question suivante après 3 secondes
+    }, 5000);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,12 +49,11 @@ const Start: React.FC = () => {
         <p>{error}</p>
       ) : (
         questions.length > 0 && (
-          <div>
-            <QuestionCard question={questions[currentQuestionIndex]} />
-            <button onClick={handleNextQuestion} className="next-button">
-              Suivant
-            </button>
-          </div>
+          <QuestionCard
+            key={currentQuestionIndex}
+            question={questions[currentQuestionIndex]}
+            onTimeUp={handleTimeUp} // Passe la logique de fin de timer
+          />
         )
       )}
     </div>

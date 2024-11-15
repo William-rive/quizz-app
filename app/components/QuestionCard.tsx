@@ -6,9 +6,10 @@ import Timer from './ui/timer';
 
 interface QuestionCardProps {
   question: Question;
+  onTimeUp: () => void;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({ question, onTimeUp }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [timeUp, setTimeUp] = useState(false); // État pour détecter la fin du temps
@@ -27,6 +28,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
       // Marque la réponse comme incorrecte si aucune sélection n'est faite
       setIsCorrect(false);
     }
+    onTimeUp();
   };
 
   return (
