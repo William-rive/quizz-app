@@ -7,16 +7,21 @@ import { Question, getAllAnswers } from '../model/question';
 const Start: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const handleNextQuestion = () => {
-    setCurrentQuestionIndex(prevIndex => (prevIndex + 1) % questions.length);
+
+  const handleAnswerValidation = (isCorrect: boolean) => {
+    if (isCorrect) {
+      setScore((prevScore) => prevScore + 1); // Incrémente le score seulement après validation
+    }
+    setTimeout(() => {
+      handleNextQuestion();
+    }, 5000); // Ajoute un délai pour afficher le résultat avant de changer de question
   };
 
-  const handleTimeUp = () => {
-    setTimeout(() => {
-      handleNextQuestion(); // Passe à la question suivante après 3 secondes
-    }, 5000);
+  const handleNextQuestion = () => {
+    setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % questions.length);
   };
 
   useEffect(() => {
@@ -45,6 +50,7 @@ const Start: React.FC = () => {
 
   return (
     <div>
+      <h2>Score : {score}</h2> {/* Affichage du score */}
       {error ? (
         <p>{error}</p>
       ) : (
@@ -52,8 +58,7 @@ const Start: React.FC = () => {
           <QuestionCard
             key={currentQuestionIndex}
             question={questions[currentQuestionIndex]}
-            onTimeUp={handleTimeUp} // Passe la logique de fin de timer
-          />
+            onAnswerValidation={handleAnswerValidation}          />
         )
       )}
     </div>

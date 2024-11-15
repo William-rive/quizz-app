@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Question } from '../model/question';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -6,29 +6,34 @@ import Timer from './ui/timer';
 
 interface QuestionCardProps {
   question: Question;
-  onTimeUp: () => void;
+  onAnswerValidation: (isCorrect: boolean) => void;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ question, onTimeUp }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidation }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [timeUp, setTimeUp] = useState(false); // État pour détecter la fin du temps
+  const [validationSent, setValidationSent] = useState(false);
 
   const answers = [...question.incorrect_answers, question.correct_answer];
 
   const handleAnswer = (answer: string) => {
-    if (timeUp) return; // Empêche de sélectionner une réponse après la fin du temps
+    if (selectedAnswer || timeUp) return; // Empêche toute interaction après sélection ou expiration du timer
     setSelectedAnswer(answer);
     setIsCorrect(answer === question.correct_answer);
   };
 
-  const handleTimeUp = () => {
-    setTimeUp(true); // Marque la fin du temps
-    if (selectedAnswer === null) {
-      // Marque la réponse comme incorrecte si aucune sélection n'est faite
-      setIsCorrect(false);
+  useEffect(() => {
+    if (timeUp && !validationSent) {
+      // Appelle la validation une seule fois après expiration du timer
+      onAnswerValidation(isCorrect === true);
+      setValidationSent(true);
     }
-    onTimeUp();
+  }, [timeUp, validationSent, isCorrect, onAnswerValidation]);
+
+
+  const handleTimeUp = () => {
+    setTimeUp(true);
   };
 
   return (
