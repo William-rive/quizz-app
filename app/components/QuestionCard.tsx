@@ -18,19 +18,19 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
   const answers = [...question.incorrect_answers, question.correct_answer];
 
   const handleAnswer = (answer: string) => {
-    if (selectedAnswer || timeUp) return; // Empêche toute interaction après sélection ou expiration du timer
-    setSelectedAnswer(answer);
-    setIsCorrect(answer === question.correct_answer);
+    if (timeUp) return; // Empêche les interactions après expiration du timer
+    setSelectedAnswer(answer); // Permet de changer le choix tant que le timer n'est pas écoulé
   };
 
   useEffect(() => {
     if (timeUp && !validationSent) {
-      // Appelle la validation une seule fois après expiration du timer
-      onAnswerValidation(isCorrect === true);
-      setValidationSent(true);
+      // Valide une seule fois après expiration du timer
+      const correct = selectedAnswer === question.correct_answer;
+      setIsCorrect(correct);
+      onAnswerValidation(correct); // Notifie le parent si la réponse est correcte
+      setValidationSent(true); // Empêche les appels multiples
     }
-  }, [timeUp, validationSent, isCorrect, onAnswerValidation]);
-
+  }, [timeUp, validationSent, selectedAnswer, question.correct_answer, onAnswerValidation]);
 
   const handleTimeUp = () => {
     setTimeUp(true);
