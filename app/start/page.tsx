@@ -20,6 +20,7 @@ const Start: React.FC = () => {
     }, 5000); // Ajoute un délai pour afficher le résultat avant de changer de question
   };
 
+
   const handleNextQuestion = () => {
     setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % questions.length);
   };
@@ -58,7 +59,7 @@ const Start: React.FC = () => {
           <QuestionCard
             key={currentQuestionIndex}
             question={questions[currentQuestionIndex]}
-            onAnswerValidation={handleAnswerValidation}          />
+            onAnswerValidation={handleAnswerValidation}/>
         )
       )}
     </div>
