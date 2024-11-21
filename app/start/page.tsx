@@ -59,10 +59,15 @@ const Start: React.FC = () => {
     }, 5000); // Délai de 5 secondes
   };
 
+  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+
   return (
     <div className="my-20">
       <h2>Score : {score}</h2>
-      <h3>Questions restantes : {questions.length - currentQuestionIndex}</h3>
+      <h3>Questions restantes : {questions.length - currentQuestionIndex - 1}</h3>
+      <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+        <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
+      </div>
       {error ? (
         <p>{error}</p>
       ) : (

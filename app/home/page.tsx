@@ -28,11 +28,11 @@ const Home: React.FC = () => {
         Bonne chance !
       </p>
       <div className="mt-8">
-        <label className="block text-xl">Catégorie :</label>
+        <label className="block text-xl text-primary">Catégorie :</label>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="mt-2 p-2 border rounded"
+          className="mt-2 p-2 border rounded-lg text-black"
         >
           <option value="all">Toutes</option>
           <option value="art_litterature">Art et Littérature</option>
@@ -44,11 +44,11 @@ const Home: React.FC = () => {
         </select>
       </div>
       <div className="mt-4">
-        <label className="block text-xl">Difficulté :</label>
+        <label className="block text-xl text-primary">Difficulté :</label>
         <select
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value)}
-          className="mt-2 p-2 border rounded"
+          className="mt-2 p-2 border rounded-lg text-black"
         >
           <option value="all">Toutes</option>
           <option value="facile">Facile</option>
