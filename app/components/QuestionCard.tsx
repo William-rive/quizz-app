@@ -8,9 +8,10 @@ interface QuestionCardProps {
   question: Question;
   onAnswerValidation: (isCorrect: boolean) => void;
   showResult: boolean;
+  correctAnswer: string | null;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidation, showResult }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidation, showResult, correctAnswer }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [timeUp, setTimeUp] = useState(false);
   const [validationSent, setValidationSent] = useState(false);
@@ -63,9 +64,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
               </Button>
             </li>
           ))}
-                  </ul>
+        </ul>
         {isCorrect !== null && timeUp && (
           <p>{isCorrect ? 'Bonne réponse !' : 'Mauvaise réponse.'}</p>
+        )}
+        {showResult && correctAnswer && (
+          <p className="text-red-500 mt-2">La bonne réponse était : {correctAnswer}</p>
         )}
       </div>
     </div>

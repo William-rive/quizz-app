@@ -11,6 +11,7 @@ const Start: React.FC = () => {
   const [score, setScore] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const [correctAnswer, setCorrectAnswer] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const category = searchParams.get('category') || 'all';
   const difficulty = searchParams.get('difficulty') || 'all';
@@ -38,17 +39,22 @@ const Start: React.FC = () => {
     setShowResult(true);
     if (isCorrect) {
       setScore(score + 1);
+      setCorrectAnswer(null); // Réinitialiser la bonne réponse si la réponse est correcte
+    } else {
+      setCorrectAnswer(questions[currentQuestionIndex].answer); // Stocker la bonne réponse si la réponse est incorrecte
     }
 
     setTimeout(() => {
       setShowResult(false);
+      setCorrectAnswer(null); // Réinitialiser la bonne réponse après l'affichage
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
         // Logique pour terminer le quiz ou réinitialiser
         alert(`Quiz terminé ! Votre score est de ${score + (isCorrect ? 1 : 0)}.`);
-        setCurrentQuestionIndex(0);
-        setScore(0);
+        localStorage.clear(); // Vider le cache
+        // Rediriger vers la page d'accueil
+        window.location.href = '/';
       }
     }, 5000); // Délai de 5 secondes
   };
@@ -56,6 +62,7 @@ const Start: React.FC = () => {
   return (
     <div className="my-20">
       <h2>Score : {score}</h2>
+      <h3>Questions restantes : {questions.length - currentQuestionIndex}</h3>
       {error ? (
         <p>{error}</p>
       ) : (
@@ -65,6 +72,7 @@ const Start: React.FC = () => {
             question={questions[currentQuestionIndex]}
             onAnswerValidation={handleAnswerValidation}
             showResult={showResult}
+            correctAnswer={correctAnswer}
           />
         )
       )}
