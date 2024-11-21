@@ -1,6 +1,5 @@
 // app/multiplayer/create/page.tsx
-import React from 'react';
-import MultiplayerQuiz from '../components/MultiplayerQuiz';
+import MultiplayerQuiz from '../components/Multiplayer/MultiplayerQuiz';
 
 const CreateRoom = () => {
   return (

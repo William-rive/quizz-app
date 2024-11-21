@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import QuestionCard from '../components/QuestionCard';
 import fetchDatabase from '../lib/api';
-import { Question, getAllAnswers } from '../model/question';
+import { Question, getAllAnswers } from '../models/model';
 
 const Start: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);

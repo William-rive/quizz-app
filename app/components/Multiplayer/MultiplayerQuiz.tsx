@@ -1,14 +1,11 @@
-// app/multiplayer/[roomId]/page.tsx
+// app/components/MultiplayerQuiz.tsx
 'use client';
 
-import React, { use } from 'react';
-import MultiplayerRoomView from '../../components/Multiplayer/MultiplayerQuizView';
+import React from 'react';
 import useMultiplayer from '../../hooks/useMultiplayer';
+import MultiplayerQuizView from './MultiplayerQuizView';
 
-const MultiplayerRoomPage: React.FC<{ params: { roomId: string } }> = ({
-  params,
-}) => {
-  const { roomId } = use(params); // Utiliser React.use() pour déstructurer params
+const MultiplayerQuiz: React.FC<{ roomId?: string }> = ({ roomId }) => {
   const {
     players,
     error,
@@ -25,13 +22,12 @@ const MultiplayerRoomPage: React.FC<{ params: { roomId: string } }> = ({
   } = useMultiplayer(roomId);
 
   return (
-    <MultiplayerRoomView
+    <MultiplayerQuizView
       players={players}
       error={error}
       isJoining={isJoining}
       setIsJoining={setIsJoining}
-      roomId={roomId!} // Utiliser une assertion non nulle
-      joinRoomId={joinRoomId}
+      roomId={roomId || joinRoomId}
       setJoinRoomId={setJoinRoomId}
       playerName={playerName}
       setPlayerName={setPlayerName}
@@ -43,4 +39,4 @@ const MultiplayerRoomPage: React.FC<{ params: { roomId: string } }> = ({
   );
 };
 
-export default MultiplayerRoomPage;
+export default MultiplayerQuiz;

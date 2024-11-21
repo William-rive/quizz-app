@@ -1,9 +1,14 @@
 'use client';
 import Image from 'next/image';
-import Link from 'next/link';
-import { Button } from '../components/ui/button';
+import { useRouter } from 'next/navigation';
+import RulesDialog from '../components/RulesDialog';
 
 const Home: React.FC = () => {
+  const router = useRouter();
+
+  const startSoloQuiz = () => router.push('/start');
+  const startMultiplayerQuiz = () => router.push('/multiplayer');
+
   return (
     <div className="flex flex-col-reverse md:flex-row text-center gap-8">
       <div className="flex-1 w-full md:flex-auto md:w-1/2 xl:w-[50rem]">
@@ -15,25 +20,40 @@ const Home: React.FC = () => {
           <br />
           Êtes-vous prêt à relever le défi ?
         </p>
-        <span className="text-xl mt-5 text-primary">Règles du jeu : </span>
-        <p className="text-xl text-center">
-          Le quiz est composé de 10 questions.
-          <br />
-          Vous avez 10 secondes pour répondre à chaque question.
-          <br />
-          Vous gagnez des points en fonction de la rapidité de votre réponse.
-          <br />
-          Bonne chance !
-        </p>
-        <Button className="mt-8">
-          <Link href="/start">Quiz Solo</Link>
-        </Button>
-        <Button>
-          <Link href="/join">Quiz Multijoueur</Link>
-        </Button>
-        <Button>
-          <Link href="/multiplayer">Créer une salle</Link>
-        </Button>
+        <RulesDialog
+          title="Quiz Solo"
+          description="Le quiz est composé de 10 questions."
+          contenu={
+            <>
+              <p>Vous avez 10 secondes pour répondre à chaque question.</p>
+              <p>
+                Vous gagnez des points en fonction de la rapidité de votre
+                réponse.
+              </p>
+              <p>Les réponses correctes rapportent des points.</p>
+              <p>Bonne chance !</p>
+            </>
+          }
+          onConfirm={startSoloQuiz}
+        />
+        <RulesDialog
+          title="Quiz Multijoueur"
+          description="Affrontez vos amis dans un quiz interactif."
+          contenu={
+            <>
+              Chaque joueur doit répondre à une série de questions.
+              <br />
+              Les réponses correctes rapportent des points.
+              <br />
+              Le joueur avec le plus de points à la fin gagne.
+              <br />
+              En cas d&apos;égalité, une question supplémentaire sera posée pour
+              départager les joueurs.
+              <p>Bonne chance à tous !</p>
+            </>
+          }
+          onConfirm={startMultiplayerQuiz}
+        />
       </div>
       <div className=" h-[40vh] md:h-auto flex items-center justify-center relative md:flex-auto">
         <Image

@@ -1,10 +1,17 @@
 'use client';
-import React, { createContext, ReactNode, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import socket from '../lib/socket';
 
 interface UserContextProps {
   playerName: string;
-  setPlayerName: (name: string) => void;
+  setPlayerName: Dispatch<SetStateAction<string>>;
   socket: typeof socket;
 }
 
@@ -27,14 +34,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     socket.connect(); // Connecte le socket une seule fois
   }, []);
 
-  const updatePlayerName = (name: string) => {
-    setPlayerName(name);
-    localStorage.setItem('playerName', name);
-  };
+  useEffect(() => {
+    if (playerName) {
+      localStorage.setItem('playerName', playerName);
+    }
+  }, [playerName]);
 
   return (
-    <UserContext.Provider
-      value={{ playerName, setPlayerName: updatePlayerName, socket }}>
+    <UserContext.Provider value={{ playerName, setPlayerName, socket }}>
       {children}
     </UserContext.Provider>
   );

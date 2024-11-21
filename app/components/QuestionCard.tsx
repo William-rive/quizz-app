@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Question } from '../model/question';
+import { Question } from '../models/model';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import Timer from './ui/timer';

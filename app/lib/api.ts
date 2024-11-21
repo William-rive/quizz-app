@@ -1,4 +1,4 @@
-import { Question } from '../model/question';
+import { Question } from '../models/model';
 
 const fetchDatabase = async (): Promise<Question[]> => {
   try {
