@@ -1,3 +1,4 @@
+// app/components/QuestionCard.tsx
 import React, { useState } from 'react';
 import { Question } from '../model/question';
 import { Badge } from './ui/badge';
@@ -6,9 +7,10 @@ import Timer from './ui/timer';
 
 interface QuestionCardProps {
   question: Question;
+  onAnswer: (answer: string) => void;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [timeUp, setTimeUp] = useState(false); // État pour détecter la fin du temps
@@ -16,9 +18,10 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
   const answers = [...question.incorrect_answers, question.correct_answer];
 
   const handleAnswer = (answer: string) => {
-    if (timeUp) return; // Empêche de sélectionner une réponse après la fin du temps
+    if (timeUp) return;
     setSelectedAnswer(answer);
     setIsCorrect(answer === question.correct_answer);
+    onAnswer(answer); // Appel de la fonction passée en prop
   };
 
   const handleTimeUp = () => {
@@ -48,7 +51,9 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
                       : isCorrect && selectedAnswer === question.correct_answer
                         ? 'bg-green-500' // Vert si correct à la fin du timer
                         : 'bg-red-500' // Rouge si incorrect à la fin du timer
-                    : ''
+                    : isCorrect == null && timeUp
+                      ? 'bg-red-500' // Rouge si aucune sélection après la fin du timer
+                      : ''
                 }>
                 {answer}
               </Button>
