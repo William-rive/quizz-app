@@ -1,5 +1,4 @@
-// app/components/QuestionCard.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Question } from '../model/question';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -7,29 +6,44 @@ import Timer from './ui/timer';
 
 interface QuestionCardProps {
   question: Question;
-  onAnswer: (answer: string) => void;
+
+  onAnswerValidation: (isCorrect: boolean) => void;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({
+  question,
+  onAnswerValidation,
+}) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [timeUp, setTimeUp] = useState(false); // État pour détecter la fin du temps
+  const [validationSent, setValidationSent] = useState(false);
 
   const answers = [...question.incorrect_answers, question.correct_answer];
 
   const handleAnswer = (answer: string) => {
-    if (timeUp) return;
-    setSelectedAnswer(answer);
-    setIsCorrect(answer === question.correct_answer);
-    onAnswer(answer); // Appel de la fonction passée en prop
+    if (timeUp) return; // Empêche les interactions après expiration du timer
+    setSelectedAnswer(answer); // Permet de changer le choix tant que le timer n'est pas écoulé
   };
 
-  const handleTimeUp = () => {
-    setTimeUp(true); // Marque la fin du temps
-    if (selectedAnswer === null) {
-      // Marque la réponse comme incorrecte si aucune sélection n'est faite
-      setIsCorrect(false);
+  useEffect(() => {
+    if (timeUp && !validationSent) {
+      // Valide une seule fois après expiration du timer
+      const correct = selectedAnswer === question.correct_answer;
+      setIsCorrect(correct);
+      onAnswerValidation(correct); // Notifie le parent si la réponse est correcte
+      setValidationSent(true); // Empêche les appels multiples
     }
+  }, [
+    timeUp,
+    validationSent,
+    selectedAnswer,
+    question.correct_answer,
+    onAnswerValidation,
+  ]);
+
+  const handleTimeUp = () => {
+    setTimeUp(true);
   };
 
   return (
