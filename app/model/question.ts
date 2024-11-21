@@ -1,13 +1,24 @@
-export interface Question {
-  id: number;
-  category: string;
-  type: string | boolean;
-  difficulty: string;
-  question: string;
-  correct_answer: string;
-  incorrect_answers: string[];
+export enum Difficulty {
+  EASY = 'facile',
+  NORMAL = 'normal',
+  HARD = 'difficile',
 }
 
-export function getAllAnswers(question: Question): string[] {
-  return [question.correct_answer, ...question.incorrect_answers];
+export enum Category {
+  ART_LITERATURE = 'art_litterature',
+  TV_CINEMA = 'tv_cinema',
+}
+
+export interface Question {
+  _id: string;
+  category: Category;
+  difficulty: Difficulty;
+  question: string;
+  answer: string;
+  badAnswers: string[];
+}
+
+export function getShuffledAnswers(question: Question): string[] {
+  const answers = [question.answer, ...question.badAnswers];
+  return answers.sort(() => Math.random() - 0.5);
 }

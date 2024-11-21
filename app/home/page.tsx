@@ -1,8 +1,12 @@
 'use client';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '../components/ui/button';
 
 const Home: React.FC = () => {
+  const [category, setCategory] = useState<string>('all');
+  const [difficulty, setDifficulty] = useState<string>('all');
+
   return (
     <div className="flex flex-col justify-center items-center gap-2">
       <h1 className="text-3xl">Bienvenue sur le quiz</h1>
@@ -23,9 +27,38 @@ const Home: React.FC = () => {
         <br />
         Bonne chance !
       </p>
-      <Button className="mt-8">
-        <Link href="/start"> Start Quiz</Link>
-      </Button>
+      <div className="mt-8">
+        <label className="block text-xl">Catégorie :</label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="mt-2 p-2 border rounded"
+        >
+          <option value="all">Toutes</option>
+          <option value="art_litterature">Art et Littérature</option>
+          <option value="tv_cinema">TV et Cinéma</option>
+          <option value="jeux_videos">Jeux Vidéos</option>
+          <option value="musique">Musique</option>
+          <option value="culture_generale">Culture Générale</option>
+          <option value="sport">Sport</option>
+        </select>
+      </div>
+      <div className="mt-4">
+        <label className="block text-xl">Difficulté :</label>
+        <select
+          value={difficulty}
+          onChange={(e) => setDifficulty(e.target.value)}
+          className="mt-2 p-2 border rounded"
+        >
+          <option value="all">Toutes</option>
+          <option value="facile">Facile</option>
+          <option value="normal">Normal</option>
+          <option value="difficile">Difficile</option>
+        </select>
+      </div>
+      <Link href={`/start?category=${category}&difficulty=${difficulty}`}>
+        <Button className="mt-8">Start Quiz</Button>
+      </Link>
     </div>
   );
 };

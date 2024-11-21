@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Question } from '../model/question';
 import { Badge } from './ui/badge';
-import { Button } from './ui/button';
 import Timer from './ui/timer';
+import { Button } from './ui/button';
 
 interface QuestionCardProps {
   question: Question;
   onAnswerValidation: (isCorrect: boolean) => void;
+  showResult: boolean;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidation }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidation, showResult }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const [timeUp, setTimeUp] = useState(false); // État pour détecter la fin du temps
+  const [timeUp, setTimeUp] = useState(false);
   const [validationSent, setValidationSent] = useState(false);
-
-  const answers = [...question.incorrect_answers, question.correct_answer];
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
   const handleAnswer = (answer: string) => {
     if (timeUp) return; // Empêche les interactions après expiration du timer
@@ -25,12 +24,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
   useEffect(() => {
     if (timeUp && !validationSent) {
       // Valide une seule fois après expiration du timer
-      const correct = selectedAnswer === question.correct_answer;
+      const correct = selectedAnswer === question.answer;
       setIsCorrect(correct);
       onAnswerValidation(correct); // Notifie le parent si la réponse est correcte
       setValidationSent(true); // Empêche les appels multiples
     }
-  }, [timeUp, validationSent, selectedAnswer, question.correct_answer, onAnswerValidation]);
+  }, [timeUp, validationSent, selectedAnswer, question.answer, onAnswerValidation]);
 
   const handleTimeUp = () => {
     setTimeUp(true);
@@ -43,7 +42,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
         <h2 className="text-lg">{question.question}</h2>
         <Timer initialSeconds={20} onTimeUp={handleTimeUp} />
         <ul className="flex gap-6">
-          {answers.map((answer, index) => (
+          {[question.answer, ...question.badAnswers].map((answer, index) => (
             <li key={index}>
               <Button
                 variant={'outline'}
@@ -52,18 +51,21 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
                   selectedAnswer === answer
                     ? !timeUp
                       ? 'bg-primary text-secondary' // Couleur temporaire après sélection
-                      : isCorrect && selectedAnswer === question.correct_answer
-                        ? 'bg-green-500' // Vert si correct à la fin du timer
-                        : 'bg-red-500' // Rouge si incorrect à la fin du timer
+                      : showResult
+                      ? isCorrect
+                        ? 'bg-green-500 text-white' // Couleur si la réponse est correcte
+                        : 'bg-red-500 text-white' // Couleur si la réponse est incorrecte
+                      : ''
                     : ''
-                }>
+                }
+              >
                 {answer}
               </Button>
             </li>
           ))}
-        </ul>
+                  </ul>
         {isCorrect !== null && timeUp && (
-          <p>{isCorrect ? 'Bonne réponse!' : 'Mauvaise réponse.'}</p>
+          <p>{isCorrect ? 'Bonne réponse !' : 'Mauvaise réponse.'}</p>
         )}
       </div>
     </div>

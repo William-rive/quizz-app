@@ -1,44 +1,29 @@
-'use client';
+"use client";
 import React, { useEffect, useState } from 'react';
-import QuestionCard from '../components/QuestionCard';
+import { useSearchParams } from 'next/navigation';
 import fetchDatabase from '../lib/api';
-import { Question, getAllAnswers } from '../model/question';
+import { Question } from '../model/question';
+import QuestionCard from '../components/QuestionCard';
 
 const Start: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
   const [error, setError] = useState<string | null>(null);
-
-
-  const handleAnswerValidation = (isCorrect: boolean) => {
-    if (isCorrect) {
-      setScore((prevScore) => prevScore + 1); // Incrémente le score seulement après validation
-    }
-    setTimeout(() => {
-      handleNextQuestion();
-    }, 5000); // Ajoute un délai pour afficher le résultat avant de changer de question
-  };
-
-
-  const handleNextQuestion = () => {
-    setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % questions.length);
-  };
+  const [score, setScore] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const searchParams = useSearchParams();
+  const category = searchParams.get('category') || 'all';
+  const difficulty = searchParams.get('difficulty') || 'all';
+  const limit = 10; // Nombre de questions à récupérer
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchDatabase();
+        const data = await fetchDatabase(category, difficulty, limit);
         if (data.length === 0) {
-          setError(
-            'Impossible de récupérer les questions. Veuillez réessayer plus tard.',
-          );
+          setError('Impossible de récupérer les questions. Veuillez réessayer plus tard.');
         } else {
-          const filteredData = data.map((item: Question) => ({
-            ...item,
-            reponses: getAllAnswers(item),
-          }));
-          setQuestions(filteredData);
+          setQuestions(data);
         }
       } catch (err) {
         console.error(err);
@@ -47,11 +32,30 @@ const Start: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [category, difficulty]);
+
+  const handleAnswerValidation = (isCorrect: boolean) => {
+    setShowResult(true);
+    if (isCorrect) {
+      setScore(score + 1);
+    }
+
+    setTimeout(() => {
+      setShowResult(false);
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+      } else {
+        // Logique pour terminer le quiz ou réinitialiser
+        alert(`Quiz terminé ! Votre score est de ${score + (isCorrect ? 1 : 0)}.`);
+        setCurrentQuestionIndex(0);
+        setScore(0);
+      }
+    }, 5000); // Délai de 5 secondes
+  };
 
   return (
-    <div>
-      <h2>Score : {score}</h2> {/* Affichage du score */}
+    <div className="my-20">
+      <h2>Score : {score}</h2>
       {error ? (
         <p>{error}</p>
       ) : (
@@ -59,7 +63,9 @@ const Start: React.FC = () => {
           <QuestionCard
             key={currentQuestionIndex}
             question={questions[currentQuestionIndex]}
-            onAnswerValidation={handleAnswerValidation}/>
+            onAnswerValidation={handleAnswerValidation}
+            showResult={showResult}
+          />
         )
       )}
     </div>
