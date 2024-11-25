@@ -29,10 +29,7 @@ const Home: React.FC = () => {
           <Link href="/start">Quiz Solo</Link>
         </Button>
         <Button>
-          <Link href="/join">Quiz Multijoueur</Link>
-        </Button>
-        <Button>
-          <Link href="/multiplayer">Créer une salle</Link>
+          <Link href="/multiplayer">Quiz Multijoueur</Link>
         </Button>
       </div>
       <div className=" h-[40vh] md:h-auto flex items-center justify-center relative md:flex-auto">
