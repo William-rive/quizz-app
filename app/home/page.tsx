@@ -1,10 +1,28 @@
 'use client';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import { Button } from '../components/ui/button';
+import FilterQuiz from '../components/FilterQuiz';
+import RulesDialog from '../components/RulesDialog';
 
-const Home: React.FC = () => {
+const Home: React.FC = ({}) => {
+  const router = useRouter();
+
+  // Fonction pour démarrer le quiz
+  const startSoloQuiz = () => {
+    // Vérifier si category et difficulty sont sélectionnés
+    if (!category || !difficulty) {
+      alert('Veuillez sélectionner une catégorie et une difficulté');
+      return;
+    }
+
+    // Naviguer vers la page de démarrage du quiz avec les paramètres sélectionnés
+    router.push(`/start?category=${category}&difficulty=${difficulty}`);
+  };
+
+  const startMultiplayerQuiz = () => router.push('/multiplayer');
+
+  // Définir les états pour category et difficulty
   const [category, setCategory] = useState<string>('all');
   const [difficulty, setDifficulty] = useState<string>('all');
 
@@ -19,50 +37,47 @@ const Home: React.FC = () => {
           <br />
           Êtes-vous prêt à relever le défi ?
         </p>
-        <span className="text-xl mt-5 text-primary">Règles du jeu : </span>
-        <p className="text-xl text-center">
-          Le quiz est composé de 10 questions.
-          <br />
-          Vous avez 10 secondes pour répondre à chaque question.
-          <br />
-          Vous gagnez des points en fonction de la rapidité de votre réponse.
-          <br />
-          Bonne chance !
-        </p>
-        <div className="mt-8">
-          <label className="block text-xl text-primary">Catégorie :</label>
-          <select
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-            className="mt-2 p-2 border rounded-lg text-black">
-            <option value="all">Toutes</option>
-            <option value="art_litterature">Art et Littérature</option>
-            <option value="tv_cinema">TV et Cinéma</option>
-            <option value="jeux_videos">Jeux Vidéos</option>
-            <option value="musique">Musique</option>
-            <option value="culture_generale">Culture Générale</option>
-            <option value="sport">Sport</option>
-          </select>
-        </div>
-        <div className="mt-4">
-          <label className="block text-xl text-primary">Difficulté :</label>
-          <select
-            value={difficulty}
-            onChange={e => setDifficulty(e.target.value)}
-            className="mt-2 p-2 border rounded-lg text-black">
-            <option value="all">Toutes</option>
-            <option value="facile">Facile</option>
-            <option value="normal">Normal</option>
-            <option value="difficile">Difficile</option>
-          </select>
-        </div>
-        <Button className="mt-8">
-          {/* <Link href={`/start?category=${category}&difficulty=${difficulty}`}> */}
-          <Link href="/start">Quiz Solo</Link>
-        </Button>
-        <Button>
-          <Link href="/multiplayer">Quiz Multijoueur</Link>
-        </Button>
+        <FilterQuiz
+          category={category}
+          difficulty={difficulty}
+          setCategory={setCategory}
+          setDifficulty={setDifficulty}
+        />
+
+        <RulesDialog
+          title="Quiz Solo"
+          description="Le quiz est composé de 10 questions."
+          contenu={
+            <>
+              <p>Vous avez 10 secondes pour répondre à chaque question.</p>
+              <p>
+                Vous gagnez des points en fonction de la rapidité de votre
+                réponse.
+              </p>
+              <p>Les réponses correctes rapportent des points.</p>
+              <p>Bonne chance !</p>
+            </>
+          }
+          onConfirm={startSoloQuiz}
+        />
+        <RulesDialog
+          title="Quiz Multijoueur"
+          description="Affrontez vos amis dans un quiz interactif."
+          contenu={
+            <>
+              Chaque joueur doit répondre à une série de questions.
+              <br />
+              Les réponses correctes rapportent des points.
+              <br />
+              Le joueur avec le plus de points à la fin gagne.
+              <br />
+              En cas d&apos;égalité, une question supplémentaire sera posée pour
+              départager les joueurs.
+              <p>Bonne chance à tous !</p>
+            </>
+          }
+          onConfirm={startMultiplayerQuiz}
+        />
       </div>
       <div className=" h-[40vh] md:h-auto flex items-center justify-center relative md:flex-auto">
         <Image

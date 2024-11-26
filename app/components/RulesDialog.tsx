@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from './ui/alert-dialog';
+import { Button } from './ui/button';
 
 interface RulesDialogProps {
   title: string;
@@ -30,17 +31,14 @@ const RulesDialog: React.FC<RulesDialogProps> = ({
   const closeDialog = () => setIsOpen(false);
 
   const handleConfirm = () => {
+    console.log('handleConfirm');
     closeDialog();
     onConfirm();
   };
 
   return (
     <>
-      <button
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        onClick={openDialog}>
-        {title}
-      </button>
+      <Button onClick={openDialog}>{title}</Button>
       {isOpen && (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
           <AlertDialogContent>

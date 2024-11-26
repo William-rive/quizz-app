@@ -1,7 +1,9 @@
+// app/components/views/MultiplayerQuizView.tsx
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useMultiplayerQuizController } from '../../controller/multiplayerQuizController';
+import FilterQuiz from '../FilterQuiz';
 import { Button } from '../ui/button';
 
 interface MultiplayerQuizViewProps {
@@ -23,6 +25,10 @@ const MultiplayerQuizView: React.FC<MultiplayerQuizViewProps> = ({
     handleJoinRoom,
     submitJoinRoom,
   } = useMultiplayerQuizController(roomId);
+
+  // Définir les états pour category et difficulty
+  const [category, setCategory] = useState<string>('all');
+  const [difficulty, setDifficulty] = useState<string>('all');
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
@@ -68,10 +74,17 @@ const MultiplayerQuizView: React.FC<MultiplayerQuizViewProps> = ({
             {players.length > 0 ? (
               players.map(player => <li key={player.id}>{player.name}</li>)
             ) : (
+              // Afficher un message si aucun joueur n'est présent
               <li>Aucun joueur pour le moment.</li>
             )}
           </ul>
-          <p>En attente de la question...</p>
+          {/* Passer category et difficulty en plus de setCategory et setDifficulty */}
+          <FilterQuiz
+            category={category}
+            difficulty={difficulty}
+            setCategory={setCategory}
+            setDifficulty={setDifficulty}
+          />
         </div>
       )}
     </div>
