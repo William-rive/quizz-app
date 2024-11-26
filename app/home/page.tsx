@@ -57,8 +57,10 @@ const Home: React.FC = () => {
           </select>
         </div>
         <Button className="mt-8">
-          {/* <Link href={`/start?category=${category}&difficulty=${difficulty}`}> */}
-          <Link href="/start">Quiz Solo</Link>
+          {/* <Link > */}
+          <Link href={`/start?category=${category}&difficulty=${difficulty}`}>
+            Quiz Solo
+          </Link>
         </Button>
         <Button>
           <Link href="/multiplayer">Quiz Multijoueur</Link>
