@@ -1,9 +1,9 @@
-"use client";
-import React, { useEffect, useState } from 'react';
+'use client';
 import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import QuestionCard from '../components/QuestionCard';
 import fetchDatabase from '../lib/api';
 import { Question } from '../model/question';
-import QuestionCard from '../components/QuestionCard';
 
 const Start: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -22,7 +22,9 @@ const Start: React.FC = () => {
       try {
         const data = await fetchDatabase(category, difficulty, limit);
         if (data.length === 0) {
-          setError('Impossible de récupérer les questions. Veuillez réessayer plus tard.');
+          setError(
+            'Impossible de récupérer les questions. Veuillez réessayer plus tard.',
+          );
         } else {
           setQuestions(data);
         }
@@ -51,7 +53,9 @@ const Start: React.FC = () => {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
         // Logique pour terminer le quiz ou réinitialiser
-        alert(`Quiz terminé ! Votre score est de ${score + (isCorrect ? 1 : 0)}.`);
+        alert(
+          `Quiz terminé ! Votre score est de ${score + (isCorrect ? 1 : 0)}.`,
+        );
         localStorage.clear(); // Vider le cache
         // Rediriger vers la page d'accueil
         window.location.href = '/';
@@ -64,9 +68,13 @@ const Start: React.FC = () => {
   return (
     <div className="my-20">
       <h2>Score : {score}</h2>
-      <h3>Questions restantes : {questions.length - currentQuestionIndex - 1}</h3>
+      <h3>
+        Questions restantes : {questions.length - currentQuestionIndex - 1}
+      </h3>
       <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-        <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
+        <div
+          className="bg-blue-600 h-2.5 rounded-full"
+          style={{ width: `${progress}%` }}></div>
       </div>
       {error ? (
         <p>{error}</p>

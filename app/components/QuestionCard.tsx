@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Question } from '../model/question';
 import { Badge } from './ui/badge';
-import Timer from './ui/timer';
 import { Button } from './ui/button';
+import Timer from './ui/timer';
 
 interface QuestionCardProps {
   question: Question;
@@ -11,7 +11,12 @@ interface QuestionCardProps {
   correctAnswer: string | null;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidation, showResult, correctAnswer }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({
+  question,
+  onAnswerValidation,
+  showResult,
+  correctAnswer,
+}) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [timeUp, setTimeUp] = useState(false);
   const [validationSent, setValidationSent] = useState(false);
@@ -30,13 +35,19 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
     const shuffledArray = [...array];
     for (let i = shuffledArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+      [shuffledArray[i], shuffledArray[j]] = [
+        shuffledArray[j],
+        shuffledArray[i],
+      ];
     }
     return shuffledArray;
   };
 
   // Mélange les réponses
-  const shuffledAnswers = useMemo(() => shuffleArray([question.answer, ...question.badAnswers]), [question]);
+  const shuffledAnswers = useMemo(
+    () => shuffleArray([question.answer, ...question.badAnswers]),
+    [question],
+  );
 
   const handleAnswer = (answer: string) => {
     if (timeUp) return; // Empêche les interactions après expiration du timer
@@ -51,7 +62,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
       onAnswerValidation(correct); // Notifie le parent si la réponse est correcte
       setValidationSent(true); // Empêche les appels multiples
     }
-  }, [timeUp, validationSent, selectedAnswer, question.answer, onAnswerValidation]);
+  }, [
+    timeUp,
+    validationSent,
+    selectedAnswer,
+    question.answer,
+    onAnswerValidation,
+  ]);
 
   const handleTimeUp = () => {
     setTimeUp(true);
@@ -74,13 +91,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
                     ? !timeUp
                       ? 'bg-primary text-secondary' // Couleur temporaire après sélection
                       : showResult
-                      ? isCorrect
-                        ? 'bg-green-500 text-white' // Couleur si la réponse est correcte
-                        : 'bg-red-500 text-white' // Couleur si la réponse est incorrecte
-                      : ''
+                        ? isCorrect
+                          ? 'bg-green-500 text-white' // Couleur si la réponse est correcte
+                          : 'bg-red-500 text-white' // Couleur si la réponse est incorrecte
+                        : ''
                     : ''
-                }
-              >
+                }>
                 {answer}
               </Button>
             </li>
@@ -90,7 +106,9 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
           <p>{isCorrect ? 'Bonne réponse !' : 'Mauvaise réponse.'}</p>
         )}
         {showResult && correctAnswer && (
-          <p className="text-red-500 mt-2">La bonne réponse était : {correctAnswer}</p>
+          <p className="text-red-500 mt-2">
+            La bonne réponse était : {correctAnswer}
+          </p>
         )}
       </div>
     </div>

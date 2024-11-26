@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
+import React, { useState } from 'react';
 import { Button } from '../components/ui/button';
 
 const Home: React.FC = () => {
@@ -8,57 +9,84 @@ const Home: React.FC = () => {
   const [difficulty, setDifficulty] = useState<string>('all');
 
   return (
-    <div className="flex flex-col justify-center items-center gap-2">
-      <h1 className="text-3xl">Bienvenue sur le quiz</h1>
-      <span className="text-xl mt-5 text-primary">Testez vos limites : </span>
-      <p className="text-xl text-center">
-        plongez dans notre Quiz Interactif et hissez-vous au sommet du
-        classement !
-        <br />
-        Êtes-vous prêt à relever le défi ?
-      </p>
-      <span className="text-xl mt-5 text-primary">Règles du jeu : </span>
-      <p className="text-xl text-center">
-        Le quiz est composé de 10 questions.
-        <br />
-        Vous avez 10 secondes pour répondre à chaque question.
-        <br />
-        Vous gagnez des points en fonction de la rapidité de votre réponse.
-        <br />
-        Bonne chance !
-      </p>
-      <div className="mt-8">
-        <label className="block text-xl text-primary">Catégorie :</label>
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="mt-2 p-2 border rounded-lg text-black"
-        >
-          <option value="all">Toutes</option>
-          <option value="art_litterature">Art et Littérature</option>
-          <option value="tv_cinema">TV et Cinéma</option>
-          <option value="jeux_videos">Jeux Vidéos</option>
-          <option value="musique">Musique</option>
-          <option value="culture_generale">Culture Générale</option>
-          <option value="sport">Sport</option>
-        </select>
+    <div className="flex flex-col-reverse md:flex-row text-center gap-8">
+      <div className="flex-1 w-full md:flex-auto md:w-1/2 xl:w-[50rem]">
+        <h1 className="text-6xl">Bienvenue sur le quiz</h1>
+        <span className="text-xl mt-5 text-primary">Testez vos limites : </span>
+        <p className="text-xl text-center">
+          plongez dans notre Quiz Interactif et hissez-vous au sommet du
+          classement !
+          <br />
+          Êtes-vous prêt à relever le défi ?
+        </p>
+        <span className="text-xl mt-5 text-primary">Règles du jeu : </span>
+        <p className="text-xl text-center">
+          Le quiz est composé de 10 questions.
+          <br />
+          Vous avez 10 secondes pour répondre à chaque question.
+          <br />
+          Vous gagnez des points en fonction de la rapidité de votre réponse.
+          <br />
+          Bonne chance !
+        </p>
+        <div className="mt-8">
+          <label className="block text-xl text-primary">Catégorie :</label>
+          <select
+            value={category}
+            onChange={e => setCategory(e.target.value)}
+            className="mt-2 p-2 border rounded-lg text-black">
+            <option value="all">Toutes</option>
+            <option value="art_litterature">Art et Littérature</option>
+            <option value="tv_cinema">TV et Cinéma</option>
+            <option value="jeux_videos">Jeux Vidéos</option>
+            <option value="musique">Musique</option>
+            <option value="culture_generale">Culture Générale</option>
+            <option value="sport">Sport</option>
+          </select>
+        </div>
+        <div className="mt-4">
+          <label className="block text-xl text-primary">Difficulté :</label>
+          <select
+            value={difficulty}
+            onChange={e => setDifficulty(e.target.value)}
+            className="mt-2 p-2 border rounded-lg text-black">
+            <option value="all">Toutes</option>
+            <option value="facile">Facile</option>
+            <option value="normal">Normal</option>
+            <option value="difficile">Difficile</option>
+          </select>
+        </div>
+        <Button className="mt-8">
+          {/* <Link href={`/start?category=${category}&difficulty=${difficulty}`}> */}
+          <Link href="/start">Quiz Solo</Link>
+        </Button>
+        <Button>
+          <Link href="/multiplayer">Quiz Multijoueur</Link>
+        </Button>
       </div>
-      <div className="mt-4">
-        <label className="block text-xl text-primary">Difficulté :</label>
-        <select
-          value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
-          className="mt-2 p-2 border rounded-lg text-black"
-        >
-          <option value="all">Toutes</option>
-          <option value="facile">Facile</option>
-          <option value="normal">Normal</option>
-          <option value="difficile">Difficile</option>
-        </select>
+      <div className=" h-[40vh] md:h-auto flex items-center justify-center relative md:flex-auto">
+        <Image
+          src="/images/perso-1.png"
+          alt="Quiz"
+          width={200}
+          height={200}
+          className="max-w-40 top-28 absolute md:max-w-prose md:top-60 right-60"
+        />
+        <Image
+          src="/images/icon.png"
+          alt="Quiz"
+          width={200}
+          height={200}
+          className="max-w-32 md:max-w-prose z-10 transform md:-translate-x-16 md:translate-y-16"
+        />
+        <Image
+          src="/images/perso-2.png"
+          alt="Quiz"
+          width={200}
+          height={200}
+          className=" max-w-40 absolute left-60 top-12 md:max-w-prose md:left-24 md:top-8"
+        />
       </div>
-      <Link href={`/start?category=${category}&difficulty=${difficulty}`}>
-        <Button className="mt-8">Start Quiz</Button>
-      </Link>
     </div>
   );
 };
