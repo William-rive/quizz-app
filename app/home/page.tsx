@@ -1,9 +1,13 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
+import React, { useState } from 'react';
 import { Button } from '../components/ui/button';
 
 const Home: React.FC = () => {
+  const [category, setCategory] = useState<string>('all');
+  const [difficulty, setDifficulty] = useState<string>('all');
+
   return (
     <div className="flex flex-col-reverse md:flex-row text-center gap-8">
       <div className="flex-1 w-full md:flex-auto md:w-1/2 xl:w-[50rem]">
@@ -25,7 +29,35 @@ const Home: React.FC = () => {
           <br />
           Bonne chance !
         </p>
+        <div className="mt-8">
+          <label className="block text-xl text-primary">Catégorie :</label>
+          <select
+            value={category}
+            onChange={e => setCategory(e.target.value)}
+            className="mt-2 p-2 border rounded-lg text-black">
+            <option value="all">Toutes</option>
+            <option value="art_litterature">Art et Littérature</option>
+            <option value="tv_cinema">TV et Cinéma</option>
+            <option value="jeux_videos">Jeux Vidéos</option>
+            <option value="musique">Musique</option>
+            <option value="culture_generale">Culture Générale</option>
+            <option value="sport">Sport</option>
+          </select>
+        </div>
+        <div className="mt-4">
+          <label className="block text-xl text-primary">Difficulté :</label>
+          <select
+            value={difficulty}
+            onChange={e => setDifficulty(e.target.value)}
+            className="mt-2 p-2 border rounded-lg text-black">
+            <option value="all">Toutes</option>
+            <option value="facile">Facile</option>
+            <option value="normal">Normal</option>
+            <option value="difficile">Difficile</option>
+          </select>
+        </div>
         <Button className="mt-8">
+          {/* <Link href={`/start?category=${category}&difficulty=${difficulty}`}> */}
           <Link href="/start">Quiz Solo</Link>
         </Button>
         <Button>

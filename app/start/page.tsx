@@ -1,42 +1,32 @@
 'use client';
+import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import QuestionCard from '../components/QuestionCard';
 import fetchDatabase from '../lib/api';
-import { Question, getAllAnswers } from '../model/question';
+import { Question } from '../model/question';
 
 const Start: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
   const [error, setError] = useState<string | null>(null);
-
-  const handleAnswerValidation = (isCorrect: boolean) => {
-    if (isCorrect) {
-      setScore(prevScore => prevScore + 1); // Incrémente le score seulement après validation
-    }
-    setTimeout(() => {
-      handleNextQuestion();
-    }, 5000); // Ajoute un délai pour afficher le résultat avant de changer de question
-  };
-
-  const handleNextQuestion = () => {
-    setCurrentQuestionIndex(prevIndex => (prevIndex + 1) % questions.length);
-  };
+  const [score, setScore] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [correctAnswer, setCorrectAnswer] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const category = searchParams.get('category') || 'all';
+  const difficulty = searchParams.get('difficulty') || 'all';
+  const limit = 10; // Nombre de questions à récupérer
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchDatabase();
+        const data = await fetchDatabase(category, difficulty, limit);
         if (data.length === 0) {
           setError(
             'Impossible de récupérer les questions. Veuillez réessayer plus tard.',
           );
         } else {
-          const filteredData = data.map((item: Question) => ({
-            ...item,
-            reponses: getAllAnswers(item),
-          }));
-          setQuestions(filteredData);
+          setQuestions(data);
         }
       } catch (err) {
         console.error(err);
@@ -45,11 +35,47 @@ const Start: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [category, difficulty]);
+
+  const handleAnswerValidation = (isCorrect: boolean) => {
+    setShowResult(true);
+    if (isCorrect) {
+      setScore(score + 1);
+      setCorrectAnswer(null); // Réinitialiser la bonne réponse si la réponse est correcte
+    } else {
+      setCorrectAnswer(questions[currentQuestionIndex].answer); // Stocker la bonne réponse si la réponse est incorrecte
+    }
+
+    setTimeout(() => {
+      setShowResult(false);
+      setCorrectAnswer(null); // Réinitialiser la bonne réponse après l'affichage
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+      } else {
+        // Logique pour terminer le quiz ou réinitialiser
+        alert(
+          `Quiz terminé ! Votre score est de ${score + (isCorrect ? 1 : 0)}.`,
+        );
+        localStorage.clear(); // Vider le cache
+        // Rediriger vers la page d'accueil
+        window.location.href = '/';
+      }
+    }, 5000); // Délai de 5 secondes
+  };
+
+  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   return (
-    <div>
-      <h2>Score : {score}</h2> {/* Affichage du score */}
+    <div className="my-20">
+      <h2>Score : {score}</h2>
+      <h3>
+        Questions restantes : {questions.length - currentQuestionIndex - 1}
+      </h3>
+      <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+        <div
+          className="bg-blue-600 h-2.5 rounded-full"
+          style={{ width: `${progress}%` }}></div>
+      </div>
       {error ? (
         <p>{error}</p>
       ) : (
@@ -58,6 +84,8 @@ const Start: React.FC = () => {
             key={currentQuestionIndex}
             question={questions[currentQuestionIndex]}
             onAnswerValidation={handleAnswerValidation}
+            showResult={showResult}
+            correctAnswer={correctAnswer}
           />
         )
       )}
