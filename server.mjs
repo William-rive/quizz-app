@@ -40,7 +40,9 @@ io.on('connection', socket => {
     }
 
     const roomId = nanoid(6); // ID court pour la salle
-    rooms[roomId] = { players: [{ id: socket.id, name: playerName }] };
+    rooms[roomId] = { 
+      players: [{ id: socket.id, name: playerName, isReady: false}] 
+    };
 
     socket.join(roomId);
     callback({ roomId });
@@ -69,7 +71,7 @@ io.on('connection', socket => {
     // Vérifiez si le joueur est déjà dans la salle
     const existingPlayer = room.players.find(p => p.id === socket.id);
     if (!existingPlayer) {
-      room.players.push({ id: socket.id, name: playerName });
+      room.players.push({ id: socket.id, name: playerName, isReady: false });
     }
 
     socket.join(roomId);
@@ -78,6 +80,16 @@ io.on('connection', socket => {
     io.to(roomId).emit('updatePlayers', room.players);
     callback({ success: true });
     console.log(`${playerName} a rejoint la salle : ${roomId}`);
+  });
+
+  socket.on('playerReady', ({ playerId, isReady }) => {
+    // Trouver le joueur dans la liste et mettre à jour son état "Prêt"
+    const player = player.find((player) => player.id === playerId);
+    if (player) {
+      player.isReady = isReady;
+    }
+    // Émettre l'événement pour informer tous les clients
+    io.emit('updatePlayers', player); // Émet les joueurs mis à jour
   });
 
   // Gestionnaire pour la déconnexion

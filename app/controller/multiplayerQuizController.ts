@@ -135,6 +135,35 @@ export const useMultiplayerQuizController = (roomId?: string) => {
     );
   };
 
+  // Fonction pour mettre à jour le statut "Prêt" d'un joueur
+  const handlePlayerReady = (playerId: string, isReady: boolean) => {
+    if (roomId) {
+      socket.emit('playerReady', { roomId, playerId, isReady });
+    }
+  };
+
+  // Fonction pour alterner l'état "Prêt" d'un joueur
+  const togglePlayerReady = (playerId: string) => {
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) =>
+        player.id === playerId ? { ...player, isReady: !player.isReady } : player
+      )
+    );
+
+    const player = players.find((player) => player.id === playerId);
+    if (player) {
+      handlePlayerReady(playerId, !player.isReady);
+      console.log('Événement updatePlayers reçu :'); // Envoie la mise à jour au serveur
+    }
+  };
+
+  // Fonction pour démarrer le quiz lorsque tous les joueurs sont prêts
+  const startQuiz = () => {
+    if (roomId) {
+      socket.emit('startQuiz', { roomId });
+    }
+  };
+
   return {
     players,
     error,
@@ -146,5 +175,7 @@ export const useMultiplayerQuizController = (roomId?: string) => {
     handleCreateRoom,
     handleJoinRoom,
     submitJoinRoom,
+    togglePlayerReady,
+    startQuiz,
   };
 };
