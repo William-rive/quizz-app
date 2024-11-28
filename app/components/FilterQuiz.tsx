@@ -1,12 +1,14 @@
 // app/components/FilterQuiz.tsx
+'use client';
 
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 
 interface FilterQuizProps {
   category: string;
   difficulty: string;
-  setCategory: Dispatch<SetStateAction<string>>;
-  setDifficulty: Dispatch<SetStateAction<string>>;
+  setCategory: (category: string) => void;
+  setDifficulty: (difficulty: string) => void;
+  onChange: () => void;
 }
 
 const FilterQuiz: React.FC<FilterQuizProps> = ({
@@ -14,14 +16,25 @@ const FilterQuiz: React.FC<FilterQuizProps> = ({
   difficulty,
   setCategory,
   setDifficulty,
+  onChange,
 }) => {
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCategory(e.target.value);
+    onChange();
+  };
+
+  const handleDifficultyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDifficulty(e.target.value);
+    onChange();
+  };
+
   return (
     <div className="flex justify-center content-center gap-8">
       <div>
         <label className="block text-xl text-primary">Catégorie :</label>
         <select
           value={category}
-          onChange={e => setCategory(e.target.value)}
+          onChange={handleCategoryChange}
           className="mt-2 p-2 border rounded-lg text-black">
           <option value="all">Toutes</option>
           <option value="art_litterature">Art et Littérature</option>
@@ -36,7 +49,7 @@ const FilterQuiz: React.FC<FilterQuizProps> = ({
         <label className="block text-xl text-primary">Difficulté :</label>
         <select
           value={difficulty}
-          onChange={e => setDifficulty(e.target.value)}
+          onChange={handleDifficultyChange}
           className="mt-2 p-2 border rounded-lg text-black">
           <option value="all">Toutes</option>
           <option value="facile">Facile</option>

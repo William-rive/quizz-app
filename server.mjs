@@ -33,15 +33,16 @@ io.on('connection', socket => {
 
   // Gestionnaire pour créer une salle
   socket.on('createRoom', ({ playerName }, callback) => {
-    console.log(`Requête de création de salle par : ${playerName}`);
     if (!playerName.trim()) {
       callback({ error: 'Un nom est obligatoire pour créer une salle.' });
       return;
     }
 
-    const roomId = nanoid(6); // ID court pour la salle
-    rooms[roomId] = { 
-      players: [{ id: socket.id, name: playerName, isReady: false}] 
+    const roomId = nanoid(6); // Génère un ID unique pour la salle
+    rooms[roomId] = {
+      players: [
+        { id: socket.id, name: playerName, isReady: false, isCreator: true },
+      ],
     };
 
     socket.join(roomId);
@@ -71,7 +72,12 @@ io.on('connection', socket => {
     // Vérifiez si le joueur est déjà dans la salle
     const existingPlayer = room.players.find(p => p.id === socket.id);
     if (!existingPlayer) {
-      room.players.push({ id: socket.id, name: playerName, isReady: false });
+      room.players.push({
+        id: socket.id,
+        name: playerName,
+        isReady: false,
+        isCreator: false,
+      });
     }
 
     socket.join(roomId);
@@ -83,13 +89,74 @@ io.on('connection', socket => {
   });
 
   socket.on('playerReady', ({ playerId, isReady }) => {
-    // Trouver le joueur dans la liste et mettre à jour son état "Prêt"
-    const player = player.find((player) => player.id === playerId);
-    if (player) {
-      player.isReady = isReady;
+    console.log(
+      `Received playerReady for player ID: ${playerId} with isReady: ${isReady}`,
+    );
+
+    // Trouver la salle à laquelle appartient le joueur
+    const roomId = Array.from(socket.rooms).find(r => r !== socket.id);
+    if (roomId && rooms[roomId]) {
+      const room = rooms[roomId];
+      const player = room.players.find(p => p.id === playerId);
+
+      if (player) {
+        player.isReady = isReady;
+        console.log(
+          `${player.name} est maintenant ${player.isReady ? 'Prêt' : 'Pas prêt'}`,
+        );
+
+        // Émettre la liste mise à jour des joueurs à tous les membres de la salle
+        io.to(roomId).emit('updatePlayers', room.players);
+      } else {
+        console.log(
+          `Joueur avec ID ${playerId} non trouvé dans la salle ${roomId}.`,
+        );
+      }
+    } else {
+      console.log(`Salle non trouvée pour le joueur ID ${playerId}.`);
     }
-    // Émettre l'événement pour informer tous les clients
-    io.emit('updatePlayers', player); // Émet les joueurs mis à jour
+  });
+
+  // Gestionnaire pour basculer l'état de prêt
+  socket.on('togglePlayerReady', playerId => {
+    console.log(`Received togglePlayerReady for player ID: ${playerId}`);
+
+    // Trouver la salle à laquelle appartient le joueur
+    const roomId = Array.from(socket.rooms).find(r => r !== socket.id);
+    if (roomId && rooms[roomId]) {
+      const room = rooms[roomId];
+      const player = room.players.find(p => p.id === playerId);
+
+      if (player) {
+        player.isReady = !player.isReady;
+        console.log(
+          `${player.name} est maintenant ${player.isReady ? 'Prêt' : 'Pas prêt'}`,
+        );
+
+        // Émettre la liste mise à jour des joueurs à tous les membres de la salle
+        io.to(roomId).emit('updatePlayers', room.players);
+      } else {
+        console.log(
+          `Joueur avec ID ${playerId} non trouvé dans la salle ${roomId}.`,
+        );
+      }
+    } else {
+      console.log(`Salle non trouvée pour le joueur ID ${playerId}.`);
+    }
+  });
+
+  // Gestionnaire pour démarrer le quiz
+  socket.on('startQuiz', roomId => {
+    const room = rooms[roomId];
+    const roomPlayers = room.players;
+    if (roomPlayers.every(p => p.isReady)) {
+      io.to(roomId).emit('quizStarted');
+      console.log(`Quiz démarré dans la salle : ${roomId}`);
+    } else {
+      console.log(
+        `Tous les joueurs ne sont pas prêts dans la salle : ${roomId}`,
+      );
+    }
   });
 
   // Gestionnaire pour la déconnexion

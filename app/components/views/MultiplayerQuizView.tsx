@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMultiplayerQuizController } from '../../controller/multiplayerQuizController';
+import socket from '../../lib/socket';
 import FilterQuiz from '../FilterQuiz';
-import socket from '../../lib/socket'; // Adjust the path as necessary
 import { Button } from '../ui/button';
 
 interface MultiplayerQuizViewProps {
@@ -26,12 +26,27 @@ const MultiplayerQuizView: React.FC<MultiplayerQuizViewProps> = ({
     submitJoinRoom,
     togglePlayerReady,
     startQuiz,
+    isCreator,
+    currentFilters,
+    setFilters,
   } = useMultiplayerQuizController(roomId);
 
-  // Définir les états pour category et difficulty
-  const [category, setCategory] = useState<string>('all');
-  const [difficulty, setDifficulty] = useState<string>('all');
-  
+  // État local pour les filtres
+  const [category, setCategory] = useState<string>(currentFilters.category);
+  const [difficulty, setDifficulty] = useState<string>(
+    currentFilters.difficulty,
+  );
+
+  // Synchroniser les états locaux avec les filtres actuels reçus
+  useEffect(() => {
+    setCategory(currentFilters.category);
+    setDifficulty(currentFilters.difficulty);
+  }, [currentFilters]);
+
+  // Fonction pour gérer les changements de filtres
+  const handleFilterChange = () => {
+    setFilters(category, difficulty);
+  };
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
@@ -75,43 +90,56 @@ const MultiplayerQuizView: React.FC<MultiplayerQuizViewProps> = ({
           <h3 className="text-xl">Joueurs ({players.length}) :</h3>
           <ul>
             {players.length > 0 ? (
-              players.map(player => 
-              <li key={player.id}>
+              players.map(player => (
+                <li key={player.id}>
                   <span>{player.name}</span>{' '}
                   <span className="text-sm ">
                     {player.isReady ? '(Prêt)' : '(Pas prêt)'}
                   </span>
-                  {player.id === socket.id ? ( // Permettre uniquement au joueur actuel de modifier son état
+                  {player.id === socket.id ? (
                     <Button
                       onClick={() => togglePlayerReady(player.id)}
-                      className="ml-4"
-                    >
+                      className="ml-4">
                       {player.isReady ? 'Annuler Prêt' : 'Prêt'}
                     </Button>
                   ) : null}
                 </li>
-              )
+              ))
             ) : (
-              // Afficher un message si aucun joueur n'est présent
               <li>Aucun joueur pour le moment.</li>
             )}
           </ul>
           {/* Bouton pour lancer le quiz (visible uniquement si tous les joueurs sont prêts) */}
-          {players.every((player) => player.isReady) && (
+          {players.every(player => player.isReady) && isCreator && (
             <Button
               onClick={startQuiz}
-              className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
-            >
+              className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
               Lancer le Quiz
             </Button>
           )}
-          {/* Passer category et difficulty en plus de setCategory et setDifficulty */}
-          <FilterQuiz
-            category={category}
-            difficulty={difficulty}
-            setCategory={setCategory}
-            setDifficulty={setDifficulty}
-          />
+          {/* Afficher ou configurer les filtres selon que l'utilisateur est le créateur */}
+          {isCreator ? (
+            <div className="mt-4">
+              <h3 className="text-xl">Configurer les Filtres du Quiz :</h3>
+              <FilterQuiz
+                category={category}
+                difficulty={difficulty}
+                setCategory={setCategory}
+                setDifficulty={setDifficulty}
+                onChange={handleFilterChange}
+              />
+            </div>
+          ) : (
+            <div className="mt-4">
+              <h3 className="text-xl">Filtres du Quiz :</h3>
+              <p>
+                <strong>Catégorie :</strong> {currentFilters.category}
+              </p>
+              <p>
+                <strong>Difficulté :</strong> {currentFilters.difficulty}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

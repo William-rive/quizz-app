@@ -10,12 +10,32 @@ export const useMultiplayerQuizController = (roomId?: string) => {
   const [error, setError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const [joinRoomId, setJoinRoomId] = useState<string>('');
+  const [isCreator, setIsCreator] = useState<boolean>(false);
+  const [currentFilters, setCurrentFilters] = useState<{
+    category: string;
+    difficulty: string;
+  }>({
+    category: 'all',
+    difficulty: 'all',
+  });
   const router = useRouter();
 
   useEffect(() => {
     const handleUpdatePlayers = (data: Player[]) => {
       console.log('Événement updatePlayers reçu :', data);
       setPlayers(data);
+      const currentPlayer = data.find(p => p.id === socket.id);
+      if (currentPlayer) {
+        setIsCreator(currentPlayer.isCreator);
+      }
+    };
+
+    const handleFiltersUpdated = (filters: {
+      category: string;
+      difficulty: string;
+    }) => {
+      console.log('Filtres mis à jour reçus :', filters);
+      setCurrentFilters(filters);
     };
 
     const handleError = (message: string) => {
@@ -32,6 +52,9 @@ export const useMultiplayerQuizController = (roomId?: string) => {
           (response: { success?: boolean; error?: string }) => {
             if (response.error) {
               setError(response.error);
+            } else {
+              console.log(`Rejoint la salle : ${roomId}`);
+              router.push(`/multiplayer/${roomId}`);
             }
           },
         );
@@ -42,20 +65,14 @@ export const useMultiplayerQuizController = (roomId?: string) => {
       console.log('Déconnecté du serveur Socket.io');
     };
 
+    // Ajout des écouteurs d'événements
     socket.on('updatePlayers', handleUpdatePlayers);
+    socket.on('filtersUpdated', handleFiltersUpdated);
     socket.on('error', handleError);
     socket.on('connect', handleConnect);
     socket.on('disconnect', handleDisconnect);
 
-    return () => {
-      socket.off('updatePlayers', handleUpdatePlayers);
-      socket.off('error', handleError);
-      socket.off('connect', handleConnect);
-      socket.off('disconnect', handleDisconnect);
-    };
-  }, [socket, roomId, playerName]);
-
-  useEffect(() => {
+    // Initial join room si roomId est présent
     if (roomId && playerName.trim()) {
       socket.emit(
         'joinRoom',
@@ -63,11 +80,22 @@ export const useMultiplayerQuizController = (roomId?: string) => {
         (response: { success?: boolean; error?: string }) => {
           if (response.error) {
             setError(response.error);
+          } else {
+            console.log('Rejoint la salle initialement :', roomId);
           }
         },
       );
     }
-  }, [roomId, playerName, socket]);
+
+    return () => {
+      // Nettoyage des écouteurs d'événements
+      socket.off('updatePlayers', handleUpdatePlayers);
+      socket.off('filtersUpdated', handleFiltersUpdated);
+      socket.off('error', handleError);
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
+    };
+  }, [socket, roomId, playerName, router]);
 
   const handleCreateRoom = () => {
     if (!playerName.trim()) {
@@ -93,6 +121,7 @@ export const useMultiplayerQuizController = (roomId?: string) => {
           const handleUpdatePlayersOnce = (data: Player[]) => {
             console.log('Événement updatePlayers reçu :', data);
             if (data.length === 1 && data[0].id === socket.id) {
+              console.log('Navigating to the created room:', response.roomId);
               router.push(`/multiplayer/${response.roomId}`);
               socket.off('updatePlayers', handleUpdatePlayersOnce);
             }
@@ -129,38 +158,72 @@ export const useMultiplayerQuizController = (roomId?: string) => {
           setError(response.error);
         } else {
           console.log('Rejoint la salle :', joinRoomId);
+          console.log(`Redirection vers /multiplayer/${joinRoomId}`);
           router.push(`/multiplayer/${joinRoomId}`);
         }
       },
     );
   };
 
-  // Fonction pour mettre à jour le statut "Prêt" d'un joueur
   const handlePlayerReady = (playerId: string, isReady: boolean) => {
     if (roomId) {
       socket.emit('playerReady', { roomId, playerId, isReady });
     }
   };
 
-  // Fonction pour alterner l'état "Prêt" d'un joueur
   const togglePlayerReady = (playerId: string) => {
-    setPlayers((prevPlayers) =>
-      prevPlayers.map((player) =>
-        player.id === playerId ? { ...player, isReady: !player.isReady } : player
-      )
+    setPlayers(prevPlayers =>
+      prevPlayers.map(player =>
+        player.id === playerId
+          ? { ...player, isReady: !player.isReady }
+          : player,
+      ),
     );
 
-    const player = players.find((player) => player.id === playerId);
+    const player = players.find(player => player.id === playerId);
     if (player) {
       handlePlayerReady(playerId, !player.isReady);
-      console.log('Événement updatePlayers reçu :'); // Envoie la mise à jour au serveur
+      console.log('Événement playerReady envoyé :', {
+        playerId,
+        isReady: !player.isReady,
+      });
     }
   };
 
-  // Fonction pour démarrer le quiz lorsque tous les joueurs sont prêts
   const startQuiz = () => {
     if (roomId) {
-      socket.emit('startQuiz', { roomId });
+      socket.emit(
+        'startQuiz',
+        { roomId },
+        (response: { success?: boolean; error?: string }) => {
+          if (response.error) {
+            console.error('Erreur lors du démarrage du quiz :', response.error);
+            setError(response.error);
+          } else {
+            console.log('Quiz démarré avec succès dans la salle :', roomId);
+          }
+        },
+      );
+    }
+  };
+
+  const setFilters = (category: string, difficulty: string) => {
+    if (roomId && isCreator) {
+      socket.emit(
+        'setFilters',
+        { roomId, category, difficulty },
+        (response: { success?: boolean; error?: string }) => {
+          if (response.error) {
+            console.error(
+              'Erreur lors de la mise à jour des filtres :',
+              response.error,
+            );
+            setError(response.error);
+          } else {
+            console.log('Filtres mis à jour :', { category, difficulty });
+          }
+        },
+      );
     }
   };
 
@@ -177,5 +240,8 @@ export const useMultiplayerQuizController = (roomId?: string) => {
     submitJoinRoom,
     togglePlayerReady,
     startQuiz,
+    isCreator,
+    currentFilters,
+    setFilters,
   };
 };
