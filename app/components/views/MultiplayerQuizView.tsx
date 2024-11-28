@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../../context/UserContext';
 import { useMultiplayerQuizController } from '../../controller/multiplayerQuizController';
 import socket from '../../lib/socket';
 import FilterQuiz from '../FilterQuiz';
@@ -13,13 +14,14 @@ interface MultiplayerQuizViewProps {
 const MultiplayerQuizView: React.FC<MultiplayerQuizViewProps> = ({
   roomId,
 }) => {
+  const { playerName, setPlayerName, resetPlayerName } =
+    useContext(UserContext);
   const {
     players,
     error,
     isJoining,
     joinRoomId,
     setJoinRoomId,
-    setPlayerName,
     setIsJoining,
     handleCreateRoom,
     handleJoinRoom,
@@ -48,6 +50,15 @@ const MultiplayerQuizView: React.FC<MultiplayerQuizViewProps> = ({
     setFilters(category, difficulty);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Champ de saisie modifié :', e.target.value);
+    setPlayerName(e.target.value);
+  };
+
+  const handleReset = () => {
+    resetPlayerName();
+  };
+
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
@@ -61,9 +72,11 @@ const MultiplayerQuizView: React.FC<MultiplayerQuizViewProps> = ({
             <input
               type="text"
               placeholder="Votre nom"
-              onChange={e => setPlayerName(e.target.value)}
+              value={playerName}
+              onChange={handleInputChange}
               className="border rounded p-2"
             />
+
             {!isJoining ? (
               <div className="flex gap-4">
                 <Button onClick={handleCreateRoom}>Créer une salle</Button>
@@ -76,7 +89,7 @@ const MultiplayerQuizView: React.FC<MultiplayerQuizViewProps> = ({
                   placeholder="Code de la salle"
                   value={joinRoomId}
                   onChange={e => setJoinRoomId(e.target.value)}
-                  className="border rounded p-2"
+                  className="border rounded p-2 text-black"
                 />
                 <Button onClick={submitJoinRoom}>Valider</Button>
                 <Button onClick={() => setIsJoining(false)}>Annuler</Button>
