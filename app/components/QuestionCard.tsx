@@ -91,10 +91,10 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                     ? !timeUp
                       ? 'bg-primary text-secondary' // Couleur temporaire après sélection
                       : showResult
-                        ? isCorrect
-                          ? 'bg-green-500 text-white' // Couleur si la réponse est correcte
-                          : 'bg-red-500 text-white' // Couleur si la réponse est incorrecte
-                        : ''
+                      ? isCorrect
+                        ? 'bg-green-500 text-white' // Couleur si la réponse est correcte
+                        : 'bg-red-500 text-white' // Couleur si la réponse est incorrecte
+                      : ''
                     : ''
                 }>
                 {answer}
@@ -105,7 +105,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
         {isCorrect !== null && timeUp && (
           <p>{isCorrect ? 'Bonne réponse !' : 'Mauvaise réponse.'}</p>
         )}
-        {showResult && correctAnswer && (
+        {correctAnswer && !isCorrect && (
           <p className="text-red-500 mt-2">
             La bonne réponse était : {correctAnswer}
           </p>

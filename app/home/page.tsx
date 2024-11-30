@@ -32,7 +32,7 @@ const Home: React.FC = ({}) => {
         <h1 className="text-6xl">Bienvenue sur le quiz</h1>
         <span className="text-xl mt-5 text-primary">Testez vos limites : </span>
         <p className="text-xl text-center">
-          plongez dans notre Quiz Interactif et hissez-vous au sommet du
+          Plongez dans notre Quiz Interactif et hissez-vous au sommet du
           classement !
           <br />
           Êtes-vous prêt à relever le défi ?
@@ -79,6 +79,11 @@ const Home: React.FC = ({}) => {
           }
           onConfirm={startMultiplayerQuiz}
         />
+        <button
+          onClick={() => router.push('/classement')}
+          className="mt-2 px-4 py-2 bg-primary text-white rounded-lg shadow-md">
+          Classement
+        </button>
       </div>
       <div className=" h-[40vh] md:h-auto flex items-center justify-center relative md:flex-auto">
         <Image

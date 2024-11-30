@@ -38,7 +38,9 @@ const RulesDialog: React.FC<RulesDialogProps> = ({
 
   return (
     <>
-      <Button onClick={openDialog}>{title}</Button>
+      <Button onClick={openDialog}
+      className='mt-4 mr-2'
+      >{title}</Button>
       {isOpen && (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
           <AlertDialogContent>

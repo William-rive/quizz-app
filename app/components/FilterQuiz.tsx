@@ -30,12 +30,12 @@ const FilterQuiz: React.FC<FilterQuizProps> = ({
 
   return (
     <div className="flex justify-center content-center gap-8">
-      <div>
-        <label className="block text-xl text-primary">Catégorie :</label>
+      <div className="flex flex-col items-start w-full max-w-xs">
+        <label className="block text-xl text-primary mb-2">Catégorie :</label>
         <select
           value={category}
           onChange={handleCategoryChange}
-          className="mt-2 p-2 border rounded-lg text-black">
+          className="block w-full px-4 py-2 text-base text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="all">Toutes</option>
           <option value="art_litterature">Art et Littérature</option>
           <option value="tv_cinema">TV et Cinéma</option>
@@ -45,12 +45,12 @@ const FilterQuiz: React.FC<FilterQuizProps> = ({
           <option value="sport">Sport</option>
         </select>
       </div>
-      <div>
-        <label className="block text-xl text-primary">Difficulté :</label>
+      <div className="flex flex-col items-start w-full max-w-xs">
+        <label className="block text-xl text-primary mb-2">Difficulté :</label>
         <select
           value={difficulty}
           onChange={handleDifficultyChange}
-          className="mt-2 p-2 border rounded-lg text-black">
+          className="block w-full px-4 py-2 text-base text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="all">Toutes</option>
           <option value="facile">Facile</option>
           <option value="normal">Normal</option>
