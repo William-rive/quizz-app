@@ -11,6 +11,7 @@ interface QuizContextProps {
   score: number;
   setScore: React.Dispatch<React.SetStateAction<number>>;
   // Ajoutez d'autres états nécessaires (timer, etc.)
+  
 }
 
 export const QuizContext = createContext<QuizContextProps | undefined>(

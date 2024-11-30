@@ -79,7 +79,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       <div className="flex flex-col gap-4 my-8 text-center items-center bg-slate-500 py-6">
         <Badge>{formatCategory(question.category)}</Badge>
         <h2 className="text-lg">{question.question}</h2>
-        <Timer initialSeconds={20} onTimeUp={handleTimeUp} />
+        <Timer initialSeconds={10} onTimeUp={handleTimeUp} />
         <ul className="flex gap-6">
           {shuffledAnswers.map((answer, index) => (
             <li key={index}>

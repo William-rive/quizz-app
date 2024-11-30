@@ -1,4 +1,5 @@
 // app/lib/userId.ts
+"use client"
 import { nanoid } from 'nanoid';
 
 export const getUserId = (): string => {
