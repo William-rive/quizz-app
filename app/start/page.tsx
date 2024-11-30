@@ -20,7 +20,12 @@ const Start: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchDatabase(category, difficulty, limit);
+        const filters = {
+          category,
+          difficulty,
+          limit,
+        };
+        const data = await fetchDatabase(filters);
         if (data.length === 0) {
           setError(
             'Impossible de récupérer les questions. Veuillez réessayer plus tard.',
@@ -35,32 +40,31 @@ const Start: React.FC = () => {
     };
 
     fetchData();
-  }, [category, difficulty]);
+  }, [category, difficulty, limit]);
 
   const handleAnswerValidation = (isCorrect: boolean) => {
-    setShowResult(true);
+    const currentQuestion = questions[currentQuestionIndex];
     if (isCorrect) {
       setScore(score + 1);
-      setCorrectAnswer(null); // Réinitialiser la bonne réponse si la réponse est correcte
+      setCorrectAnswer(currentQuestion.answer);
     } else {
-      setCorrectAnswer(questions[currentQuestionIndex].answer); // Stocker la bonne réponse si la réponse est incorrecte
+      setCorrectAnswer(currentQuestion.answer);
     }
 
-    setTimeout(() => {
-      setShowResult(false);
-      setCorrectAnswer(null); // Réinitialiser la bonne réponse après l'affichage
-      if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex + 1 < questions.length) {
+      setTimeout(() => {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
-      } else {
-        // Logique pour terminer le quiz ou réinitialiser
-        alert(
-          `Quiz terminé ! Votre score est de ${score + (isCorrect ? 1 : 0)}.`,
-        );
-        localStorage.clear(); // Vider le cache
-        // Rediriger vers la page d'accueil
-        window.location.href = '/';
-      }
-    }, 5000); // Délai de 5 secondes
+        setCorrectAnswer(null);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        setShowResult(true);
+        // Rediriger vers la page d'accueil après 5 secondes
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 5000);
+      }, 1000);
+    }
   };
 
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;

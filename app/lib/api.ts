@@ -1,29 +1,30 @@
 import { Question } from '../model/question';
 
-const CACHE_KEY = 'questions';
-const CACHE_EXPIRATION_KEY = 'questions_expiration';
-const CACHE_DURATION_MS = 60 * 60 * 1000; // 1 heure
+interface Filters {
+  category?: string;
+  difficulty?: string;
+  limit?: number;
+}
 
-const fetchDatabase = async (category: string, difficulty: string, limit: number = 10): Promise<Question[]> => {
+const fetchDatabase = async (filters: Filters = {}): Promise<Question[]> => {
   try {
-    // Vérifie s'il y a des questions en cache
-    const cachedQuestions = localStorage.getItem(CACHE_KEY);
-    const cacheExpiration = localStorage.getItem(CACHE_EXPIRATION_KEY);
-
-    if (cachedQuestions && cacheExpiration && Date.now() < parseInt(cacheExpiration, 10)) {
-      return JSON.parse(cachedQuestions) as Question[];
-    }
-
     // Construit l'URL avec les paramètres de catégorie et de difficulté
-    let url = `https://quizzapi.jomoreschi.fr/api/v1/quiz?limit=${limit}`;
-    if (category !== 'all') {
-      url += `&category=${encodeURIComponent(category)}`;
+    let url = 'https://quizzapi.jomoreschi.fr/api/v1/quiz?';
+    const params = new URLSearchParams();
+
+    if (filters.limit) {
+      params.append('limit', filters.limit.toString());
     }
-    if (difficulty !== 'all') {
-      url += `&difficulty=${encodeURIComponent(difficulty)}`;
+    if (filters.category && filters.category !== 'all') {
+      params.append('category', encodeURIComponent(filters.category));
+    }
+    if (filters.difficulty && filters.difficulty !== 'all') {
+      params.append('difficulty', encodeURIComponent(filters.difficulty));
     }
 
-    // Appelle l'API si le cache est invalide ou expiré
+    url += params.toString();
+
+    // Appelle l'API
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -35,10 +36,6 @@ const fetchDatabase = async (category: string, difficulty: string, limit: number
     if (!data.quizzes || !Array.isArray(data.quizzes)) {
       throw new Error('Invalid API response: Missing or malformed quizzes');
     }
-
-    // Met en cache les questions et met à jour la date d'expiration
-    localStorage.setItem(CACHE_KEY, JSON.stringify(data.quizzes));
-    localStorage.setItem(CACHE_EXPIRATION_KEY, (Date.now() + CACHE_DURATION_MS).toString());
 
     return data.quizzes as Question[];
   } catch (error) {

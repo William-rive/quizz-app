@@ -42,6 +42,7 @@ const Home: React.FC = ({}) => {
           difficulty={difficulty}
           setCategory={setCategory}
           setDifficulty={setDifficulty}
+          onChange={() => {}}
         />
 
         <RulesDialog
