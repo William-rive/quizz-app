@@ -1,11 +1,13 @@
 'use client';
+
+// app/controller/multiplayerQuizController.ts
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../context/UserContext';
 import { Player } from '../model/player';
 
 export const useMultiplayerQuizController = (roomId?: string) => {
-  const { playerName, setPlayerName, socket } = useContext(UserContext);
+  const { userId, playerName, setPlayerName, socket } = useContext(UserContext);
   const [players, setPlayers] = useState<Player[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState<boolean>(false);
@@ -24,7 +26,7 @@ export const useMultiplayerQuizController = (roomId?: string) => {
     const handleUpdatePlayers = (data: Player[]) => {
       console.log('Événement updatePlayers reçu :', data);
       setPlayers(data);
-      const currentPlayer = data.find(p => p.id === socket.id);
+      const currentPlayer = data.find(p => p.id === userId);
       if (currentPlayer) {
         setIsCreator(currentPlayer.isCreator);
       }
@@ -95,7 +97,7 @@ export const useMultiplayerQuizController = (roomId?: string) => {
       socket.off('connect', handleConnect);
       socket.off('disconnect', handleDisconnect);
     };
-  }, [socket, roomId, playerName, router]);
+  }, [socket, roomId, playerName, router, userId]);
 
   const handleCreateRoom = () => {
     if (!playerName.trim()) {
@@ -120,7 +122,7 @@ export const useMultiplayerQuizController = (roomId?: string) => {
 
           const handleUpdatePlayersOnce = (data: Player[]) => {
             console.log('Événement updatePlayers reçu :', data);
-            if (data.length === 1 && data[0].id === socket.id) {
+            if (data.length === 1 && data[0].id === userId) {
               console.log('Navigating to the created room:', response.roomId);
               router.push(`/multiplayer/${response.roomId}`);
               socket.off('updatePlayers', handleUpdatePlayersOnce);

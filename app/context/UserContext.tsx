@@ -1,16 +1,12 @@
 'use client';
 
-import React, {
-  createContext,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
-import getSocket from '../lib/socket';
+import socket from '../lib/socket';
+import { getUserId } from '../lib/userId';
 
 interface UserContextProps {
+  userId: string;
   playerName: string;
   setPlayerName: (name: string) => void;
   resetPlayerName: () => void;
@@ -18,21 +14,22 @@ interface UserContextProps {
 }
 
 export const UserContext = createContext<UserContextProps>({
+  userId: '',
   playerName: '',
   setPlayerName: () => {},
   resetPlayerName: () => {},
-  socket: getSocket,
+  socket: socket,
 });
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [playerName, setPlayerNameState] = useState<string>('');
-  const socket = getSocket;
+  const userId = getUserId();
 
   useEffect(() => {
     const storedName = localStorage.getItem('playerName');
-    console.log('Nom stocké dans localStorage:', storedName);
+    console.log('Nom stocké dans localStorage :', storedName);
     if (storedName) {
       setPlayerNameState(storedName);
     }
@@ -40,19 +37,17 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     if (!socket.connected) {
       console.log('Connexion au socket...');
       socket.connect();
-    } else {
-      console.log('Socket déjà connecté.');
     }
 
+    // Ne déconnectez pas le socket lors du nettoyage
     return () => {
-      console.log('UserProvider démonté.');
-      // Optionnel : Déconnecter le socket lors du démontage
-      // socket.disconnect();
+      console.log('UserProvider démonté');
+      // socket.disconnect(); // Commenté pour persister la connexion
     };
-  }, [socket]);
+  }, []);
 
   const updatePlayerName = (name: string) => {
-    console.log('Mise à jour du nom du joueur:', name);
+    console.log('Mise à jour du nom du joueur :', name);
     setPlayerNameState(name);
     if (name.trim()) {
       localStorage.setItem('playerName', name);
@@ -67,17 +62,16 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.removeItem('playerName');
   };
 
-  const contextValue = useMemo(
-    () => ({
-      playerName,
-      setPlayerName: updatePlayerName,
-      resetPlayerName,
-      socket,
-    }),
-    [playerName, socket],
-  );
-
   return (
-    <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
+    <UserContext.Provider
+      value={{
+        userId,
+        playerName,
+        setPlayerName: updatePlayerName,
+        resetPlayerName,
+        socket,
+      }}>
+      {children}
+    </UserContext.Provider>
   );
 };

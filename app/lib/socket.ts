@@ -1,10 +1,15 @@
-'use client';
-
+// app/lib/socket.ts
+"use client"
 import { io, Socket } from 'socket.io-client';
+import { getUserId } from './userId';
 
-// Créez une instance unique de Socket.IO
+const userId = getUserId();
+
 const socket: Socket = io('http://localhost:3001', {
-  autoConnect: false, // Empêche la connexion automatique
+  autoConnect: false,
+  auth: {
+    userId, // Envoyer l'ID utilisateur lors de la connexion
+  },
 });
 
 export default socket;

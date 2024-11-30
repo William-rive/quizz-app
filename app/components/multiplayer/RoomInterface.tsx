@@ -1,9 +1,9 @@
 // app/components/RoomInterface.tsx
 import React from 'react';
+import { Button } from '../ui/button';
 import socket from '../../lib/socket';
 import { Player } from '../../model/player';
 import FilterQuiz from '../FilterQuiz';
-import { Button } from '../ui/button';
 
 interface RoomInterfaceProps {
   visible: boolean;
@@ -47,7 +47,7 @@ const RoomInterface: React.FC<RoomInterfaceProps> = ({
                 {player.isReady ? '(Prêt)' : '(Pas prêt)'}
               </span>
               {/* Si c'est le joueur actuel, afficher le bouton */}
-              {player.id === socket.id && (
+              {player.id === socket.auth.userId && (
                 <Button onClick={() => togglePlayerReady(player.id)}>
                   {player.isReady ? 'Se déclarer non prêt' : 'Se déclarer prêt'}
                 </Button>
