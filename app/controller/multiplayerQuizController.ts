@@ -243,5 +243,6 @@ export const useMultiplayerQuizController = (roomId?: string) => {
     isCreator,
     currentFilters,
     setFilters,
+    roomId,
   };
 };

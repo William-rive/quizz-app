@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { QuizProvider } from './context/QuizContext';
 import { UserProvider } from './context/UserContext';
 import './globals.css';
 
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <UserProvider>{children}</UserProvider>
+        <UserProvider>
+          <QuizProvider>{children}</QuizProvider>
+        </UserProvider>
       </body>
     </html>
   );
