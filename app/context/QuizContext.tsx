@@ -1,6 +1,6 @@
 // app/context/QuizContext.tsx
 'use client';
-import React, { createContext, useState } from 'react';
+import React, { createContext, ReactNode, useState } from 'react';
 import { Question } from '../model/question';
 
 interface QuizContextProps {
@@ -10,21 +10,24 @@ interface QuizContextProps {
   setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>;
   score: number;
   setScore: React.Dispatch<React.SetStateAction<number>>;
-  // Ajoutez d'autres états nécessaires (timer, etc.)
-  
+  isCreator: boolean;
+  setIsCreator: React.Dispatch<React.SetStateAction<boolean>>;
+  isReady: boolean;
+  setIsReady: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const QuizContext = createContext<QuizContextProps | undefined>(
   undefined,
 );
 
-export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
+export const QuizProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
-  // Autres états...
+  const [isCreator, setIsCreator] = useState<boolean>(false);
+  const [isReady, setIsReady] = useState<boolean>(false);
 
   return (
     <QuizContext.Provider
@@ -35,7 +38,10 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
         setCurrentQuestionIndex,
         score,
         setScore,
-        // Autres états...
+        isCreator,
+        setIsCreator,
+        isReady,
+        setIsReady,
       }}>
       {children}
     </QuizContext.Provider>
