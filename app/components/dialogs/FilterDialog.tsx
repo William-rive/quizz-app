@@ -26,7 +26,7 @@ const FilterDialog: React.FC<FilterDialogProps> = ({
   const [category, setCategory] = useState<string>('all');
   const [difficulty, setDifficulty] = useState<string>('all');
 
-  // Réinitialise les filtres à l'ouverture du dialogue
+  // Réinitialiser les filtres à l'ouverture du dialogue
   useEffect(() => {
     if (isOpen) {
       setCategory('all');
@@ -35,8 +35,8 @@ const FilterDialog: React.FC<FilterDialogProps> = ({
   }, [isOpen]);
 
   const handleStart = () => {
-    onStart(category, difficulty); // Passe les filtres sélectionnés
-    onClose(); // Ferme le dialogue
+    onStart(category, difficulty); // Passer les filtres sélectionnés
+    onClose(); // Fermer le dialogue
   };
 
   return (
@@ -45,20 +45,20 @@ const FilterDialog: React.FC<FilterDialogProps> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Choisir les Filtres</AlertDialogTitle>
           <AlertDialogDescription>
-            {/* Le composant de sélection de filtres */}
-            <FilterQuiz
-              category={category}
-              difficulty={difficulty}
-              setCategory={setCategory}
-              setDifficulty={setDifficulty}
-              onChange={() => {}} // Pas besoin de cette fonction ici
-            />
+            Sélectionnez les filtres pour votre quiz :
           </AlertDialogDescription>
         </AlertDialogHeader>
+
+        <FilterQuiz
+          category={category}
+          difficulty={difficulty}
+          setCategory={setCategory}
+          setDifficulty={setDifficulty}
+          onChange={() => {}} // Fonction vide ou ajoutez une logique si nécessaire
+        />
+
         <div className="flex justify-end gap-4 mt-4">
-          {/* Bouton pour fermer le dialogue */}
           <AlertDialogCancel onClick={onClose}>Annuler</AlertDialogCancel>
-          {/* Bouton pour démarrer avec les filtres */}
           <AlertDialogAction onClick={handleStart}>Commencer</AlertDialogAction>
         </div>
       </AlertDialogContent>
