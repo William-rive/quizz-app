@@ -26,8 +26,8 @@ const Timer: React.FC<TimerProps> = ({ initialSeconds, onTimeUp }) => {
   }, [seconds, onTimeUp, initialSeconds]);
 
   return (
-    <div className="flex flex-col items-center absolute right-16">
-      <p>Temps restant : {seconds} secondes</p>
+    <div className="flex flex-col items-center top-0 absolute md:right-16">
+      <p>Temps restant :</p>
       <Progress value={progress} /> {/* Affichage de la progression */}
     </div>
   );

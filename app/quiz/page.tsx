@@ -31,14 +31,14 @@ const Start: React.FC = () => {
   }
 
   return (
-    <div className="my-20">
-      <h2>Score : {score}</h2>
-      <h3>
-        Questions restantes : {questions.length - currentQuestionIndex - 1}
+    <div className="flex flex-col my-20 items-center px-4">
+      <h2 className="text-2xl">Score : <span className="text-primary">{score}</span></h2>
+      <h3 className="text-xl mb-2">
+        Questions restantes : {questions.length - currentQuestionIndex === 1 ? 'Dernière question' : questions.length - currentQuestionIndex}
       </h3>
-      <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+      <div className="w-full lg:w-[35rem] bg-gray-200 rounded-full h-2.5 mb-4">
         <div
-          className="bg-blue-600 h-2.5 rounded-full"
+          className="bg-primary h-2.5 rounded-full"
           style={{ width: `${progress}%` }}></div>
       </div>
       {questions.length > 0 && (

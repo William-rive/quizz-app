@@ -3,6 +3,7 @@ import { Question } from '../model/question';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import Timer from './ui/timer';
+import { Card } from './ui/card';
 
 interface QuestionCardProps {
   question: Question;
@@ -71,48 +72,43 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
 
   return (
     <div className="question-card">
-      <div className="flex flex-col gap-4 my-8 text-center items-center bg-slate-500 py-6">
-        <Badge>{formatCategory(question.category)}</Badge>
-        <h2 className="text-lg">{question.question}</h2>
-        <Timer initialSeconds={10} onTimeUp={handleTimeUp} />
-        <ul className="flex gap-6">
-          {shuffledAnswers.map((answer, index) => {
-            const isSelected = selectedAnswer === answer;
-            const isCorrectAnswer = correctAnswer === answer;
-            const isWrongAnswer = isSelected && !isCorrectAnswer;
-
-            return (
+      <Card className="max-w-sm md:max-w-full px-2">
+        <div className="flex flex-col gap-4 my-8 text-center items-center py-6 flex-wrap">
+          <Badge>{formatCategory(question.category)}</Badge>
+          <h2 className="text-lg">{question.question}</h2>
+          <Timer initialSeconds={10} onTimeUp={handleTimeUp} />
+          <ul className="flex text-wrap flex-wrap justify-center gap-6">
+            {shuffledAnswers.map((answer, index) => (
               <li key={index}>
                 <Button
                   variant={'outline'}
                   onClick={() => handleAnswer(answer)}
-                  className={`${
-                    isSelected && !timeUp
-                      ? 'bg-primary text-secondary'
-                      : timeUp
-                      ? isCorrectAnswer
-                        ? 'bg-green-500 text-white'
-                        : isWrongAnswer
-                        ? 'bg-red-500 text-white'
-                        : ''
+                  className={
+                    selectedAnswer === answer
+                      ? !timeUp
+                        ? 'bg-primary text-secondary' // Couleur temporaire après sélection
+                        : showResult
+                          ? isCorrect
+                            ? 'bg-green-500 text-white' // Couleur si la réponse est correcte
+                            : 'bg-red-500 text-white' // Couleur si la réponse est incorrecte
+                          : ''
                       : ''
-                  }`}
-                >
+                  }>
                   {answer}
                 </Button>
               </li>
-            );
-          })}
-        </ul>
-        {isCorrect !== null && timeUp && (
-          <p>{isCorrect ? 'Bonne réponse !' : 'Mauvaise réponse.'}</p>
-        )}
-        {correctAnswer && !isCorrect && (
-          <p className="text-red-500 mt-2">
-            La bonne réponse était : {correctAnswer}
-          </p>
-        )}
-      </div>
+            ))}
+          </ul>
+          {isCorrect !== null && timeUp && (
+            <p>{isCorrect ? 'Bonne réponse !' : 'Mauvaise réponse.'}</p>
+          )}
+          {correctAnswer && !isCorrect && (
+            <p className="text-red-500 mt-2">
+              La bonne réponse était : {correctAnswer}
+            </p>
+          )}
+        </div>
+      </Card>
     </div>
   );
 };
