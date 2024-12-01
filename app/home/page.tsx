@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FilterDialog from '../components/dialogs/FilterDialog';
 import RulesDialog from '../components/dialogs/RulesDialog';
 import Images from '../components/home/Images';
@@ -9,6 +9,18 @@ const Home: React.FC = () => {
   const router = useRouter();
 
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState<boolean>(false);
+
+  // Effacer tous les quizStates du localStorage lorsqu'on est sur la page d'accueil
+  useEffect(() => {
+    // Parcourir les clés du localStorage et supprimer celles qui correspondent à un quizState
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('quizState_')) {
+        localStorage.removeItem(key);
+        console.log(`QuizState ${key} supprimé du localStorage`);
+      }
+    }
+  }, []); // Ce useEffect ne s'exécute qu'une seule fois au montage de la page d'accueil
 
   const handleStartQuiz = (
     selectedCategory: string,
