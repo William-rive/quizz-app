@@ -11,14 +11,24 @@ const Start: React.FC = () => {
     showResult,
     correctAnswer,
     error,
+    isLoading,
     handleAnswerValidation,
   } = useQuizController();
+  
+  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
 
-  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="loader" />
+        <div className="loader border-t-white border-4 rounded-full w-16 h-16 animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="my-20">

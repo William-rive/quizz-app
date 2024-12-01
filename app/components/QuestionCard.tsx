@@ -14,7 +14,6 @@ interface QuestionCardProps {
 const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   onAnswerValidation,
-  showResult,
   correctAnswer,
 }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -22,7 +21,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   const [validationSent, setValidationSent] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
-  // Fonction utilitaire pour capitaliser la première lettre de chaque mot et enlever les underscores
   const formatCategory = (category: string) => {
     return category
       .split('_')
@@ -30,7 +28,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       .join(' ');
   };
 
-  // Fonction utilitaire pour mélanger les éléments d'un tableau
   const shuffleArray = <T,>(array: T[]): T[] => {
     const shuffledArray = [...array];
     for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -43,24 +40,22 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     return shuffledArray;
   };
 
-  // Mélange les réponses
   const shuffledAnswers = useMemo(
     () => shuffleArray([question.answer, ...question.badAnswers]),
     [question],
   );
 
   const handleAnswer = (answer: string) => {
-    if (timeUp) return; // Empêche les interactions après expiration du timer
-    setSelectedAnswer(answer); // Permet de changer le choix tant que le timer n'est pas écoulé
+    if (timeUp) return;
+    setSelectedAnswer(answer);
   };
 
   useEffect(() => {
     if (timeUp && !validationSent) {
-      // Valide une seule fois après expiration du timer
       const correct = selectedAnswer === question.answer;
       setIsCorrect(correct);
-      onAnswerValidation(correct); // Notifie le parent si la réponse est correcte
-      setValidationSent(true); // Empêche les appels multiples
+      onAnswerValidation(correct);
+      setValidationSent(true);
     }
   }, [
     timeUp,
@@ -81,26 +76,33 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
         <h2 className="text-lg">{question.question}</h2>
         <Timer initialSeconds={10} onTimeUp={handleTimeUp} />
         <ul className="flex gap-6">
-          {shuffledAnswers.map((answer, index) => (
-            <li key={index}>
-              <Button
-                variant={'outline'}
-                onClick={() => handleAnswer(answer)}
-                className={
-                  selectedAnswer === answer
-                    ? !timeUp
-                      ? 'bg-primary text-secondary' // Couleur temporaire après sélection
-                      : showResult
-                      ? isCorrect
-                        ? 'bg-green-500 text-white' // Couleur si la réponse est correcte
-                        : 'bg-red-500 text-white' // Couleur si la réponse est incorrecte
+          {shuffledAnswers.map((answer, index) => {
+            const isSelected = selectedAnswer === answer;
+            const isCorrectAnswer = correctAnswer === answer;
+            const isWrongAnswer = isSelected && !isCorrectAnswer;
+
+            return (
+              <li key={index}>
+                <Button
+                  variant={'outline'}
+                  onClick={() => handleAnswer(answer)}
+                  className={`${
+                    isSelected && !timeUp
+                      ? 'bg-primary text-secondary'
+                      : timeUp
+                      ? isCorrectAnswer
+                        ? 'bg-green-500 text-white'
+                        : isWrongAnswer
+                        ? 'bg-red-500 text-white'
+                        : ''
                       : ''
-                    : ''
-                }>
-                {answer}
-              </Button>
-            </li>
-          ))}
+                  }`}
+                >
+                  {answer}
+                </Button>
+              </li>
+            );
+          })}
         </ul>
         {isCorrect !== null && timeUp && (
           <p>{isCorrect ? 'Bonne réponse !' : 'Mauvaise réponse.'}</p>
