@@ -27,7 +27,6 @@ const Home: React.FC = () => {
         <span className="text-xl mt-5 text-primary">Testez vos limites :</span>
         <p className="text-xl text-center">
           Plongez dans notre Quiz Interactif et hissez-vous au sommet du
-          Plongez dans notre Quiz Interactif et hissez-vous au sommet du
           classement !
           <br />
           Êtes-vous prêt à relever le défi ?

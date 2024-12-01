@@ -80,6 +80,20 @@ const useQuizController = () => {
     }
   }, [questions, score, currentQuestionIndex, showResult, quizId]);
 
+  // Gestion du bouton "Retour"
+  useEffect(() => {
+    const handlePopState = () => {
+      localStorage.removeItem(`quizState_${quizId}`);
+      console.log(`QuizState ${quizId} supprimé après retour en arrière`);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [quizId]);
+
   // Validation de la réponse
   const handleAnswerValidation = (isCorrect: boolean) => {
     const currentQuestion = questions[currentQuestionIndex];
