@@ -46,7 +46,7 @@ const RulesDialog: React.FC<RulesDialogProps> = ({
             <AlertDialogHeader className="gap-4">
               <AlertDialogTitle>{title}</AlertDialogTitle>
               <AlertDialogDescription>{description}</AlertDialogDescription>
-              <div>{contenu}</div>
+              <div className="flex flex-col gap-2">{contenu}</div>
             </AlertDialogHeader>
             <div className="flex justify-center items-baseline gap-4 mt-4">
               <AlertDialogCancel onClick={closeDialog}>

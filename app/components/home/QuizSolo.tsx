@@ -5,9 +5,7 @@ interface SoloRulesProps {
   onOpenFilterDialog: () => void;
 }
 
-const SoloRules: React.FC<SoloRulesProps> = ({
-  onOpenFilterDialog,
-}) => {
+const SoloRules: React.FC<SoloRulesProps> = ({ onOpenFilterDialog }) => {
   return (
     <RulesDialog
       title="Quiz Solo"
@@ -15,9 +13,6 @@ const SoloRules: React.FC<SoloRulesProps> = ({
       contenu={
         <>
           <p>Vous avez 10 secondes pour répondre à chaque question.</p>
-          <p>
-            Vous gagnez des points en fonction de la rapidité de votre réponse.
-          </p>
           <p>Les réponses correctes rapportent des points.</p>
           <p>Bonne chance !</p>
         </>
