@@ -1,5 +1,7 @@
 'use client';
 
+// app/components/dialogs/RulesDialog.tsx
+
 import React, { useState } from 'react';
 import {
   AlertDialog,
@@ -9,8 +11,8 @@ import {
   AlertDialogDescription,
   AlertDialogHeader,
   AlertDialogTitle,
-} from './ui/alert-dialog';
-import { Button } from './ui/button';
+} from '../ui/alert-dialog';
+import { Button } from '../ui/button';
 
 interface RulesDialogProps {
   title: string;
@@ -30,12 +32,6 @@ const RulesDialog: React.FC<RulesDialogProps> = ({
   const openDialog = () => setIsOpen(true);
   const closeDialog = () => setIsOpen(false);
 
-  const handleConfirm = () => {
-    console.log('handleConfirm');
-    closeDialog();
-    onConfirm();
-  };
-
   return (
     <>
       <Button onClick={openDialog}
@@ -47,16 +43,14 @@ const RulesDialog: React.FC<RulesDialogProps> = ({
             <AlertDialogHeader>
               <AlertDialogTitle>{title}</AlertDialogTitle>
               <AlertDialogDescription>{description}</AlertDialogDescription>
-              <div>
-                {/* Ajouter des règles supplémentaires ici */}
-                {contenu}
-              </div>
+              <div>{contenu}</div>
             </AlertDialogHeader>
             <div className="flex justify-end gap-4 mt-4">
               <AlertDialogCancel onClick={closeDialog}>
                 Annuler
               </AlertDialogCancel>
-              <AlertDialogAction onClick={handleConfirm}>
+              {/* Appeler onConfirm pour ouvrir le FilterDialog */}
+              <AlertDialogAction onClick={() => onConfirm()}>
                 Commencer
               </AlertDialogAction>
             </div>
