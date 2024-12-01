@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { nanoid } from 'nanoid';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import fetchDatabase from '../lib/api';
 import { Question } from '../model/question';
 
@@ -8,7 +8,7 @@ interface QuizState {
   savedQuestions: Question[];
   savedScore: number;
   savedCurrentQuestionIndex: number;
-  isFinished: boolean; // Ajoutez cette propriété pour vérifier si le quiz est terminé
+  isFinished: boolean;
 }
 
 const useQuizController = () => {
@@ -22,8 +22,10 @@ const useQuizController = () => {
   const category = searchParams.get('category') || 'all';
   const difficulty = searchParams.get('difficulty') || 'all';
   const limit = 10; // Nombre de questions à récupérer
+  
+  const router = useRouter();
 
-  // Vérifier si un état de quiz existe déjà
+  // Gestion de l'identifiant unique pour chaque quiz
   const existingQuizId = useMemo(() => {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -34,89 +36,51 @@ const useQuizController = () => {
     return null;
   }, []);
 
-  // Générer un identifiant unique pour chaque quiz si aucun état de quiz n'existe ou si le quiz est terminé
-  const quizId = useMemo(() => {
-    if (existingQuizId) {
-      const savedQuizState = localStorage.getItem(`quizState_${existingQuizId}`);
-      if (savedQuizState) {
-        const { isFinished }: QuizState = JSON.parse(savedQuizState);
-        if (isFinished) {
-          return nanoid(6);
-        }
-      }
-      return existingQuizId;
-    }
-    return nanoid(6);
-  }, [existingQuizId]);
+  const quizId = useMemo(() => existingQuizId || nanoid(6), [existingQuizId]);
 
+  // Charger ou initialiser l'état du quiz
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const filters = { category, difficulty, limit };
+        const data = await fetchDatabase(filters);
+        if (data.length === 0) {
+          setError('Impossible de récupérer les questions. Veuillez réessayer plus tard.');
+        } else {
+          setQuestions(data);
+        }
+      } catch (err) {
+        console.error(err);
+        setError('Erreur lors de la récupération des données.');
+      }
+    };
+
     const savedQuizState = localStorage.getItem(`quizState_${quizId}`);
     if (savedQuizState) {
       const { savedQuestions, savedScore, savedCurrentQuestionIndex, isFinished }: QuizState = JSON.parse(savedQuizState);
-      if (!isFinished) {
-        setQuestions(savedQuestions);
-        setScore(savedScore);
-        setCurrentQuestionIndex(savedCurrentQuestionIndex);
-      } else {
-        const fetchData = async () => {
-          try {
-            const filters = {
-              category,
-              difficulty,
-              limit,
-            };
-            const data = await fetchDatabase(filters);
-            if (data.length === 0) {
-              setError(
-                'Impossible de récupérer les questions. Veuillez réessayer plus tard.',
-              );
-            } else {
-              setQuestions(data);
-            }
-          } catch (err) {
-            console.error(err);
-            setError('Erreur lors de la récupération des données.');
-          }
-        };
-
-        fetchData();
-      }
+      setQuestions(savedQuestions);
+      setScore(savedScore);
+      setCurrentQuestionIndex(savedCurrentQuestionIndex);
+      setShowResult(isFinished);
     } else {
-      const fetchData = async () => {
-        try {
-          const filters = {
-            category,
-            difficulty,
-            limit,
-          };
-          const data = await fetchDatabase(filters);
-          if (data.length === 0) {
-            setError(
-              'Impossible de récupérer les questions. Veuillez réessayer plus tard.',
-            );
-          } else {
-            setQuestions(data);
-          }
-        } catch (err) {
-          console.error(err);
-          setError('Erreur lors de la récupération des données.');
-        }
-      };
-
       fetchData();
     }
   }, [category, difficulty, limit, quizId]);
 
+  // Sauvegarder l'état du quiz
   useEffect(() => {
     const quizState: QuizState = {
       savedQuestions: questions,
       savedScore: score,
       savedCurrentQuestionIndex: currentQuestionIndex,
-      isFinished: showResult, // Mettre à jour l'état de fin du quiz
+      isFinished: showResult,
     };
+    if (showResult === false) {
     localStorage.setItem(`quizState_${quizId}`, JSON.stringify(quizState));
+    }
   }, [questions, score, currentQuestionIndex, showResult, quizId]);
 
+  // Validation de la réponse
   const handleAnswerValidation = (isCorrect: boolean) => {
     const currentQuestion = questions[currentQuestionIndex];
     const newScore = isCorrect ? score + 1 : score;
@@ -134,7 +98,6 @@ const useQuizController = () => {
     } else {
       setTimeout(() => {
         setShowResult(true);
-        // Enregistrer les résultats et rediriger vers la page de classement
         const results = {
           score: newScore,
           totalQuestions: questions.length,
@@ -143,7 +106,8 @@ const useQuizController = () => {
           quizId,
         };
         localStorage.setItem(`quizResults_${quizId}`, JSON.stringify(results));
-        window.location.href = `/classement?quizId=${quizId}`;
+        localStorage.removeItem(`quizState_${quizId}`);
+        router.push('/classement');
       }, 3000); // Délai de 3 secondes avant de montrer les résultats
     }
   };
