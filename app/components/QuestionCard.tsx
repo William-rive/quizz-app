@@ -1,21 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Question } from '../model/question';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import Timer from './ui/timer';
+import { Card } from './ui/card';
 
 interface QuestionCardProps {
   question: Question;
   onAnswerValidation: (isCorrect: boolean) => void;
+  showResult: boolean;
+  correctAnswer: string | null;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidation }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({
+  question,
+  onAnswerValidation,
+  showResult,
+  correctAnswer,
+}) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const [timeUp, setTimeUp] = useState(false); // État pour détecter la fin du temps
+  const [timeUp, setTimeUp] = useState(false);
   const [validationSent, setValidationSent] = useState(false);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
-  const answers = [...question.incorrect_answers, question.correct_answer];
+  // Fonction utilitaire pour capitaliser la première lettre de chaque mot et enlever les underscores
+  const formatCategory = (category: string) => {
+    return category
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Fonction utilitaire pour mélanger les éléments d'un tableau
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffledArray = [...array];
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledArray[i], shuffledArray[j]] = [
+        shuffledArray[j],
+        shuffledArray[i],
+      ];
+    }
+    return shuffledArray;
+  };
+
+  // Mélange les réponses
+  const shuffledAnswers = useMemo(
+    () => shuffleArray([question.answer, ...question.badAnswers]),
+    [question],
+  );
 
   const handleAnswer = (answer: string) => {
     if (timeUp) return; // Empêche les interactions après expiration du timer
@@ -25,12 +58,18 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
   useEffect(() => {
     if (timeUp && !validationSent) {
       // Valide une seule fois après expiration du timer
-      const correct = selectedAnswer === question.correct_answer;
+      const correct = selectedAnswer === question.answer;
       setIsCorrect(correct);
       onAnswerValidation(correct); // Notifie le parent si la réponse est correcte
       setValidationSent(true); // Empêche les appels multiples
     }
-  }, [timeUp, validationSent, selectedAnswer, question.correct_answer, onAnswerValidation]);
+  }, [
+    timeUp,
+    validationSent,
+    selectedAnswer,
+    question.answer,
+    onAnswerValidation,
+  ]);
 
   const handleTimeUp = () => {
     setTimeUp(true);
@@ -38,34 +77,53 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerValidatio
 
   return (
     <div className="question-card">
-      <div className="flex flex-col gap-4 my-8 text-center items-center bg-slate-500 py-6">
-        <Badge>{question.category}</Badge>
-        <h2 className="text-lg">{question.question}</h2>
-        <Timer initialSeconds={20} onTimeUp={handleTimeUp} />
-        <ul className="flex gap-6">
-          {answers.map((answer, index) => (
-            <li key={index}>
-              <Button
-                variant={'outline'}
-                onClick={() => handleAnswer(answer)}
-                className={
-                  selectedAnswer === answer
-                    ? !timeUp
+      <Card className="max-w-sm md:max-w-full px-2">
+        <div className="flex flex-col gap-4 my-8 text-center items-center py-6 flex-wrap">
+          <Badge>{formatCategory(question.category)}</Badge>
+          <h2 className="text-lg">{question.question}</h2>
+          <Timer initialSeconds={10} onTimeUp={handleTimeUp} />
+          <ul className="flex text-wrap flex-wrap justify-center gap-6">
+            {shuffledAnswers.map((answer, index) => {
+              const isSelected = selectedAnswer === answer;
+              const isCorrectAnswer = correctAnswer === answer;
+              const isWrongAnswer = isSelected && !isCorrectAnswer;
+
+              return (
+                <li key={index}>
+                  <Button
+                    variant={'outline'}
+                    onClick={() => handleAnswer(answer)}
+                    className={
+                      isSelected
+                      ? !timeUp
                       ? 'bg-primary text-secondary' // Couleur temporaire après sélection
-                      : isCorrect && selectedAnswer === question.correct_answer
-                        ? 'bg-green-500' // Vert si correct à la fin du timer
-                        : 'bg-red-500' // Rouge si incorrect à la fin du timer
-                    : ''
-                }>
-                {answer}
-              </Button>
-            </li>
-          ))}
-        </ul>
-        {isCorrect !== null && timeUp && (
-          <p>{isCorrect ? 'Bonne réponse!' : 'Mauvaise réponse.'}</p>
-        )}
-      </div>
+                      : showResult || timeUp
+                      ? isCorrectAnswer
+                        ? 'bg-green-500 text-white' // Couleur si la réponse est correcte
+                        : isWrongAnswer
+                        ? 'bg-red-500 text-white' // Couleur si la réponse est incorrecte
+                        : ''
+                      : ''
+                      : correctAnswer === answer && !isCorrect
+                      ? 'bg-green-500 text-white' // Afficher la bonne réponse en vert si la réponse sélectionnée était mauvaise
+                      : ''                  
+                    }>
+                    {answer}
+                  </Button>
+                </li>
+              );
+            })}
+          </ul>
+          {isCorrect !== null && timeUp && (
+            <p>{isCorrect ? 'Bonne réponse !' : 'Mauvaise réponse.'}</p>
+          )}
+          {correctAnswer && !isCorrect && (
+            <p className="text-red-500 mt-2">
+              La bonne réponse était : {correctAnswer}
+            </p>
+          )}
+        </div>
+      </Card>
     </div>
   );
 };

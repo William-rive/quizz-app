@@ -1,31 +1,60 @@
 'use client';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import FilterDialog from '../components/dialogs/FilterDialog';
+import Images from '../components/home/Images';
+import SoloRules from '../components/home/SoloRules';
+import MultiplayerRules from '../components/home/MultiplayerRules';
+import useClearQuizState from '../hook/useClearQuizState';
 import { Button } from '../components/ui/button';
 
+
 const Home: React.FC = () => {
+  const router = useRouter();
+  useClearQuizState();
+
+  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState<boolean>(false);
+
+  const handleStartQuiz = (
+    selectedCategory: string,
+    selectedDifficulty: string,
+  ) => {
+    setIsFilterDialogOpen(false); // Fermer le dialogue après la sélection
+    router.push(
+      `/quiz?category=${selectedCategory}&difficulty=${selectedDifficulty}`,
+    );
+  };
+
   return (
-    <div className="flex flex-col justify-center items-center gap-2">
-      <h1 className="text-3xl">Bienvenue sur le quiz</h1>
-      <span className="text-xl mt-5 text-primary">Testez vos limites : </span>
-      <p className="text-xl text-center">
-        plongez dans notre Quiz Interactif et hissez-vous au sommet du
-        classement !
-        <br />
-        Êtes-vous prêt à relever le défi ?
-      </p>
-      <span className="text-xl mt-5 text-primary">Règles du jeu : </span>
-      <p className="text-xl text-center">
-        Le quiz est composé de 10 questions.
-        <br />
-        Vous avez 10 secondes pour répondre à chaque question.
-        <br />
-        Vous gagnez des points en fonction de la rapidité de votre réponse.
-        <br />
-        Bonne chance !
-      </p>
-      <Button className="mt-8">
-        <Link href="/start"> Start Quiz</Link>
-      </Button>
+    <div className="flex flex-col-reverse md:flex-row text-center gap-8"> 
+      <div className="flex flex-col gap-2 flex-1 w-full md:flex-auto md:w-1/2 xl:w-[50rem]">
+        <h1 className="text-6xl">Bienvenue sur le quiz</h1>
+        <span className="text-2xl mt-5 text-primary">Testez vos limites :</span>
+        <p className="text-xl text-center">
+          Plongez dans notre Quiz Interactif et hissez-vous au sommet du
+          classement !
+          <br />
+          Êtes-vous prêt à relever le défi ?
+        </p>
+        <div>
+          {/* Dialogue des règles pour le Quiz Solo */}
+          <SoloRules onOpenFilterDialog={() => setIsFilterDialogOpen(true)} />
+          <MultiplayerRules />
+          <FilterDialog
+            isOpen={isFilterDialogOpen}
+            onClose={() => setIsFilterDialogOpen(false)} // Fermer le dialogue
+            onStart={handleStartQuiz} // Passer la fonction de démarrage
+          />
+          <Button
+            onClick={() => router.push('/classement')}
+            className="mt-2 px-4 py-2 bg-primary text-white rounded-lg shadow-md">
+            Classement
+          </Button>
+        </div>
+      </div>
+
+      <Images />
+   
     </div>
   );
 };
