@@ -40,8 +40,7 @@ const RulesDialog: React.FC<RulesDialogProps> = ({
       {isOpen && (
         <AlertDialog
           open={isOpen}
-          onOpenChange={setIsOpen}
-          className="items-center">
+          onOpenChange={setIsOpen}>
           <AlertDialogContent>
             <AlertDialogHeader className="gap-4">
               <AlertDialogTitle>{title}</AlertDialogTitle>
