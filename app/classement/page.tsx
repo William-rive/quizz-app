@@ -85,12 +85,12 @@ const Classement: React.FC = () => {
       </div>
       <button
         onClick={() => router.push('/')}
-        className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-300">
+        className="mt-6 px-4 py-2 bg-blue-800 text-white rounded-lg shadow-md hover:bg-blue-950 transition duration-300">
         Retour à la page d&apos;accueil
       </button>
       <button
         onClick={clearResults}
-        className="mt-6 ml-4 px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition duration-300">
+        className="mt-6 ml-4 px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-700 transition duration-300">
         Vider le classement
       </button>
     </div>
