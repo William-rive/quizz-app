@@ -42,7 +42,16 @@ const Classement: React.FC = () => {
   };
 
   if (results.length === 0) {
-    return <div>Chargement des résultats...</div>;
+    return (
+    <div>
+      <p>Chargement des résultats...</p>
+      <button
+        onClick={() => router.push('/')}
+        className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-300">
+        Retour à la page d&apos;accueil
+      </button>
+    </div>
+    );
   }
 
   return (
