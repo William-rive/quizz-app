@@ -2,7 +2,7 @@
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import QuestionCard from '../components/QuestionCard';
-import fetchDatabase from '../lib/api';
+import { fetchQuestions } from '../controller/quizController';
 import { Question } from '../model/question';
 
 const Start: React.FC = () => {
@@ -20,7 +20,7 @@ const Start: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchDatabase(category, difficulty, limit);
+        const data = await fetchQuestions(category, difficulty, limit);
         if (data.length === 0) {
           setError(
             'Impossible de récupérer les questions. Veuillez réessayer plus tard.',
@@ -56,7 +56,6 @@ const Start: React.FC = () => {
         alert(
           `Quiz terminé ! Votre score est de ${score + (isCorrect ? 1 : 0)}.`,
         );
-        localStorage.clear(); // Vider le cache
         // Rediriger vers la page d'accueil
         window.location.href = '/';
       }

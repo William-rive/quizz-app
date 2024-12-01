@@ -1,19 +1,39 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import fetchDatabase from '../lib/api';
 import { Question } from '../model/question';
 
-export const getQuizQuestions = async (
-  req: NextApiRequest,
-  res: NextApiResponse,
-) => {
-  const data = await fetchDatabase();
+export const fetchQuestions = async (
+  category: string,
+  difficulty: string,
+  limit: number = 10,
+): Promise<Question[]> => {
+  try {
+    // Construit l'URL avec les paramètres de catégorie et de difficulté
+    let url = `https://quizzapi.jomoreschi.fr/api/v1/quiz?limit=${limit}`;
+    if (category !== 'all') {
+      url += `&category=${encodeURIComponent(category)}`;
+    }
+    if (difficulty !== 'all') {
+      url += `&difficulty=${encodeURIComponent(difficulty)}`;
+    }
 
-  if (data) {
-    const questions: Question[] = data;
-    res.status(200).json(questions);
-  } else {
-    res
-      .status(500)
-      .json({ message: 'Erreur lors de la récupération des questions.' });
+    // Appelle l'API
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Ajoutez des logs pour vérifier la réponse de l'API
+    console.log("Réponse brute de l'API :", data);
+
+    // Vérifie que les données reçues contiennent un tableau de questions
+    if (data.quizzes && Array.isArray(data.quizzes)) {
+      return data.quizzes as Question[];
+    } else {
+      throw new Error('Invalid API response: Expected an array of questions');
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return [];
   }
 };
