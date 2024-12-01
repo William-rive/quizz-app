@@ -34,18 +34,21 @@ const RulesDialog: React.FC<RulesDialogProps> = ({
 
   return (
     <>
-      <Button onClick={openDialog}
-      className='mt-4 mr-2'
-      >{title}</Button>
+      <Button onClick={openDialog} className="mt-4 mr-2">
+        {title}
+      </Button>
       {isOpen && (
-        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+        <AlertDialog
+          open={isOpen}
+          onOpenChange={setIsOpen}
+          className="items-center">
           <AlertDialogContent>
-            <AlertDialogHeader>
+            <AlertDialogHeader className="gap-4">
               <AlertDialogTitle>{title}</AlertDialogTitle>
               <AlertDialogDescription>{description}</AlertDialogDescription>
               <div>{contenu}</div>
             </AlertDialogHeader>
-            <div className="flex justify-end gap-4 mt-4">
+            <div className="flex justify-center items-baseline gap-4 mt-4">
               <AlertDialogCancel onClick={closeDialog}>
                 Annuler
               </AlertDialogCancel>
