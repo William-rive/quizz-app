@@ -18,7 +18,7 @@ const Home: React.FC = () => {
   ) => {
     setIsFilterDialogOpen(false); // Fermer le dialogue après la sélection
     router.push(
-      `/start?category=${selectedCategory}&difficulty=${selectedDifficulty}`,
+      `/quiz?category=${selectedCategory}&difficulty=${selectedDifficulty}`,
     );
   };
 
