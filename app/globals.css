@@ -58,7 +58,7 @@ body {
   height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  overflow-x: hidden;
 }
 
 @layer base {
@@ -67,5 +67,11 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@screen lg {
+  .card-center {
+    align-items: center;
   }
 }
