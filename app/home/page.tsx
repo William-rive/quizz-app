@@ -6,7 +6,7 @@ import Images from '../components/home/Images';
 import SoloRules from '../components/home/SoloRules';
 import MultiplayerRules from '../components/home/MultiplayerRules';
 import useClearQuizState from '../hook/useClearQuizState';
-import { Button } from '../components/ui/Button';
+import { Button } from '../components/ui/button';
 
 
 const Home: React.FC = () => {

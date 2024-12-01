@@ -57,7 +57,7 @@ const FilterDialog: React.FC<FilterDialogProps> = ({
           onChange={() => {}} // Fonction vide ou ajoutez une logique si nécessaire
         />
 
-        <div className="flex justify-end gap-4 mt-4">
+        <div className="flex justify-center items-baseline gap-4 mt-4">
           <AlertDialogCancel onClick={onClose}>Annuler</AlertDialogCancel>
           <AlertDialogAction onClick={handleStart}>Commencer</AlertDialogAction>
         </div>
