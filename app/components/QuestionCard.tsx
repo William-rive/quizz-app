@@ -22,6 +22,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   const [timeUp, setTimeUp] = useState(false);
   const [validationSent, setValidationSent] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [progress, setProgress] = useState(100); // Ajoutez cette ligne
 
   // Fonction utilitaire pour capitaliser la première lettre de chaque mot et enlever les underscores
   const formatCategory = (category: string) => {
@@ -75,13 +76,27 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     setTimeUp(true);
   };
 
+  const handleProgress = (progress: number) => {
+    setProgress(progress);
+  };
+
   return (
     <div className="question-card">
-      <Card className="max-w-sm md:max-w-full px-2">
+      <Card
+        className="max-w-sm md:max-w-full px-2"
+        style={{
+          borderColor: `hsl(${progress}, 100%, 50%)`, 
+          borderWidth: '4px',
+          borderStyle: 'solid',
+        }}>
         <div className="flex flex-col gap-4 my-8 text-center items-center py-6 flex-wrap">
           <Badge>{formatCategory(question.category)}</Badge>
           <h2 className="text-lg">{question.question}</h2>
-          <Timer initialSeconds={10} onTimeUp={handleTimeUp} />
+          <Timer
+            initialSeconds={10}
+            onTimeUp={handleTimeUp}
+            onProgress={handleProgress}
+          />
           <ul className="flex text-wrap flex-wrap justify-center gap-6">
             {shuffledAnswers.map((answer, index) => (
               <li key={index}>
