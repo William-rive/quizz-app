@@ -3,7 +3,7 @@ import React from 'react';
 
 const Images: React.FC = () => {
   return (
-    <div className=" h-[30vh] md:h-auto flex items-center justify-center relative md:flex-auto">
+    <div className=" h-[30vh] flex items-center justify-center relative md:flex-auto">
       <Image
         src="/images/perso-1.png"
         alt="Quiz"
@@ -23,7 +23,7 @@ const Images: React.FC = () => {
         alt="Quiz"
         width={200}
         height={200}
-        className="max-w-60 absolute bottom-0 left-64 md:max-w-prose md:left-60"
+        className="max-w-60 absolute bottom-0 left-64 md:max-w-prose md:left-44"
       />
     </div>
   );

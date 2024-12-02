@@ -106,7 +106,6 @@ export const useMultiplayerQuizController = (roomId?: string) => {
     }
 
     console.log('Création de la salle avec le nom :', playerName);
-
     socket.emit(
       'createRoom',
       { playerName },
@@ -119,7 +118,6 @@ export const useMultiplayerQuizController = (roomId?: string) => {
           setError(response.error);
         } else if (response.roomId) {
           console.log("Salle créée avec l'ID :", response.roomId);
-
           const handleUpdatePlayersOnce = (data: Player[]) => {
             console.log('Événement updatePlayers reçu :', data);
             if (data.length === 1 && data[0].id === userId) {
@@ -128,7 +126,6 @@ export const useMultiplayerQuizController = (roomId?: string) => {
               socket.off('updatePlayers', handleUpdatePlayersOnce);
             }
           };
-
           socket.on('updatePlayers', handleUpdatePlayersOnce);
         }
       },
@@ -147,7 +144,6 @@ export const useMultiplayerQuizController = (roomId?: string) => {
     }
 
     console.log('Tentative de rejoindre la salle :', joinRoomId);
-
     socket.emit(
       'joinRoom',
       { roomId: joinRoomId, playerName },
@@ -172,7 +168,6 @@ export const useMultiplayerQuizController = (roomId?: string) => {
       socket.emit('playerReady', { roomId, playerId, isReady });
     }
   };
-
   const togglePlayerReady = (playerId: string) => {
     setPlayers(prevPlayers =>
       prevPlayers.map(player =>

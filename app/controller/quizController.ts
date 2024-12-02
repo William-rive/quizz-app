@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
 import { useRouter, useSearchParams } from 'next/navigation';
 import fetchDatabase from '../lib/api';
@@ -19,6 +19,7 @@ const useQuizController = () => {
   const [correctAnswer, setCorrectAnswer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [quizId, setQuizId] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
   const category = searchParams.get('category') || 'all';
@@ -28,17 +29,21 @@ const useQuizController = () => {
   const router = useRouter();
 
   // Générer ou récupérer un identifiant unique pour le quiz
-  const existingQuizId = useMemo(() => {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('quizState_')) {
-        return key.replace('quizState_', '');
+  useEffect(() => {
+    const getExistingQuizId = () => {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('quizState_')) {
+          return key.replace('quizState_', '');
+        }
       }
-    }
-    return null;
+      return null;
+    };
+    const existingQuizId = getExistingQuizId();
+    const newQuizId = existingQuizId || nanoid(6);
+    setQuizId(newQuizId);
   }, []);
 
-  const quizId = useMemo(() => existingQuizId || nanoid(6), [existingQuizId]);
 
   // Charger ou initialiser l'état du quiz
   useEffect(() => {
