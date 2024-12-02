@@ -1,6 +1,6 @@
-import React from 'react';
-import MultiplayerQuizView from './views/MultiplayerQuizView';
+"use client"
 import { UserProvider } from '../context/UserContext';
+import MultiplayerQuizView from './views/MultiplayerQuizView';
 
 interface MultiplayerQuizProps {
   roomId?: string;
@@ -8,9 +8,9 @@ interface MultiplayerQuizProps {
 
 const MultiplayerQuiz: React.FC<MultiplayerQuizProps> = ({ roomId }) => {
   return (
-  <UserProvider>
+    <UserProvider>
       <MultiplayerQuizView roomId={roomId} />
-  </UserProvider>
+    </UserProvider>
   );
 };
 
