@@ -5,18 +5,28 @@ import { nanoid } from 'nanoid';
 import { Server } from 'socket.io';
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: '*', // Ajustez selon vos besoins
-    methods: ['GET', 'POST'],
-  },
-});
+app.use(cors());
 
 const rooms = {};
 
-// Middleware CORS
-app.use(cors());
+// Créer une fonction serverless pour gérer les connexions Socket.io
+export default function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    // CORS pré-vol
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+
+  // Configurez le serveur socket.io
+  const server = http.createServer(app);
+  const io = new Server(server, {
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST'],
+    },
+  });
 
 // Gestion des connexions Socket.io
 io.on('connection', socket => {
@@ -259,3 +269,4 @@ io.on('connection', socket => {
 server.listen(3001, () => {
   console.log('Server listening on port 3001');
 });
+}
