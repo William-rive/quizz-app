@@ -1,9 +1,10 @@
 'use client';
-import React from 'react';
+import React, { Suspense } from 'react';
 import QuestionCard from '../components/QuestionCard';
 import useQuizController from '../controller/quizController';
 
-const Start: React.FC = () => {
+// Composant qui gère le rendu du quiz
+const QuizContent: React.FC = () => {
   const {
     questions,
     score,
@@ -14,7 +15,7 @@ const Start: React.FC = () => {
     isLoading,
     handleAnswerValidation,
   } = useQuizController();
-  
+
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   if (error) {
@@ -51,6 +52,14 @@ const Start: React.FC = () => {
         />
       )}
     </div>
+  );
+};
+
+const Start: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Loading quiz...</div>}>
+      <QuizContent />
+    </Suspense>
   );
 };
 
