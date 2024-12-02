@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, ReactNode, useEffect, useState } from 'react';
-import socket from '../lib/socket';
+import { initializeSocket, CustomSocket } from '../lib/socket';
 import { getUserId } from '../lib/userId';
 
 interface UserContextProps {
@@ -9,7 +9,7 @@ interface UserContextProps {
   playerName: string;
   setPlayerName: (name: string) => void;
   resetPlayerName: () => void;
-  socket: typeof socket;
+  socket: CustomSocket;
   isCreator: boolean;
   setIsCreator: (value: boolean) => void;
   isReady: boolean;
@@ -21,7 +21,7 @@ export const UserContext = createContext<UserContextProps>({
   playerName: '',
   setPlayerName: () => {},
   resetPlayerName: () => {},
-  socket: socket,
+  socket: initializeSocket(),
   isCreator: false,
   setIsCreator: () => {},
   isReady: false,
@@ -35,6 +35,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const [isCreator, setIsCreator] = useState<boolean>(false);
   const [isReady, setIsReady] = useState<boolean>(false);
   const userId = getUserId();
+  const socket = initializeSocket();
 
   useEffect(() => {
     const storedName = localStorage.getItem('playerName');
@@ -47,9 +48,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     return () => {
-      // socket.disconnect(); // Commenté pour persister la connexion
+      socket.disconnect();
     };
-  }, []);
+  }, [socket]);
 
   const updatePlayerName = (name: string) => {
     setPlayerNameState(name);
