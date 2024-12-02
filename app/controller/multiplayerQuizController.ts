@@ -23,9 +23,8 @@ export const useMultiplayerQuizController = (roomId?: string) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!socket) return;
-
     const handleUpdatePlayers = (data: Player[]) => {
+      console.log('Événement updatePlayers reçu :', data);
       setPlayers(data);
       const currentPlayer = data.find(p => p.id === userId);
       if (currentPlayer) {
@@ -37,14 +36,17 @@ export const useMultiplayerQuizController = (roomId?: string) => {
       category: string;
       difficulty: string;
     }) => {
+      console.log('Filtres mis à jour reçus :', filters);
       setCurrentFilters(filters);
     };
 
     const handleError = (message: string) => {
+      console.error('Erreur Socket.IO :', message);
       setError(message);
     };
 
     const handleConnect = () => {
+      console.log('Connecté au serveur Socket.io');
       if (roomId && playerName.trim()) {
         socket.emit(
           'joinRoom',
@@ -53,6 +55,7 @@ export const useMultiplayerQuizController = (roomId?: string) => {
             if (response.error) {
               setError(response.error);
             } else {
+              console.log(`Rejoint la salle : ${roomId}`);
               router.push(`/multiplayer/${roomId}`);
             }
           },
@@ -73,7 +76,17 @@ export const useMultiplayerQuizController = (roomId?: string) => {
 
     // Initial join room si roomId est présent
     if (roomId && playerName.trim()) {
-      socket.connect();
+      socket.emit(
+        'joinRoom',
+        { roomId, playerName },
+        (response: { success?: boolean; error?: string }) => {
+          if (response.error) {
+            setError(response.error);
+          } else {
+            console.log('Rejoint la salle initialement :', roomId);
+          }
+        },
+      );
     }
 
     return () => {
@@ -92,14 +105,28 @@ export const useMultiplayerQuizController = (roomId?: string) => {
       return;
     }
 
+    console.log('Création de la salle avec le nom :', playerName);
     socket.emit(
       'createRoom',
       { playerName },
       (response: { roomId?: string; error?: string }) => {
         if (response.error) {
+          console.error(
+            'Erreur lors de la création de la salle :',
+            response.error,
+          );
           setError(response.error);
         } else if (response.roomId) {
-          router.push(`/multiplayer/${response.roomId}`);
+          console.log("Salle créée avec l'ID :", response.roomId);
+          const handleUpdatePlayersOnce = (data: Player[]) => {
+            console.log('Événement updatePlayers reçu :', data);
+            if (data.length === 1 && data[0].id === userId) {
+              console.log('Navigating to the created room:', response.roomId);
+              router.push(`/multiplayer/${response.roomId}`);
+              socket.off('updatePlayers', handleUpdatePlayersOnce);
+            }
+          };
+          socket.on('updatePlayers', handleUpdatePlayersOnce);
         }
       },
     );
@@ -107,6 +134,7 @@ export const useMultiplayerQuizController = (roomId?: string) => {
 
   const handleJoinRoom = () => {
     setIsJoining(true);
+    console.log('Affichage du champ de saisie pour rejoindre une salle');
   };
 
   const submitJoinRoom = () => {
@@ -115,19 +143,31 @@ export const useMultiplayerQuizController = (roomId?: string) => {
       return;
     }
 
+    console.log('Tentative de rejoindre la salle :', joinRoomId);
     socket.emit(
       'joinRoom',
       { roomId: joinRoomId, playerName },
       (response: { success?: boolean; error?: string }) => {
         if (response.error) {
+          console.error(
+            'Erreur lors de la jonction de la salle :',
+            response.error,
+          );
           setError(response.error);
         } else {
+          console.log('Rejoint la salle :', joinRoomId);
+          console.log(`Redirection vers /multiplayer/${joinRoomId}`);
           router.push(`/multiplayer/${joinRoomId}`);
         }
       },
     );
   };
 
+  const handlePlayerReady = (playerId: string, isReady: boolean) => {
+    if (roomId) {
+      socket.emit('playerReady', { roomId, playerId, isReady });
+    }
+  };
   const togglePlayerReady = (playerId: string) => {
     setPlayers(prevPlayers =>
       prevPlayers.map(player =>
@@ -139,7 +179,11 @@ export const useMultiplayerQuizController = (roomId?: string) => {
 
     const player = players.find(player => player.id === playerId);
     if (player) {
-      socket.emit('playerReady', { roomId, playerId, isReady: !player.isReady });
+      handlePlayerReady(playerId, !player.isReady);
+      console.log('Événement playerReady envoyé :', {
+        playerId,
+        isReady: !player.isReady,
+      });
     }
   };
 
@@ -150,7 +194,10 @@ export const useMultiplayerQuizController = (roomId?: string) => {
         { roomId },
         (response: { success?: boolean; error?: string }) => {
           if (response.error) {
+            console.error('Erreur lors du démarrage du quiz :', response.error);
             setError(response.error);
+          } else {
+            console.log('Quiz démarré avec succès dans la salle :', roomId);
           }
         },
       );
@@ -164,7 +211,13 @@ export const useMultiplayerQuizController = (roomId?: string) => {
         { roomId, category, difficulty },
         (response: { success?: boolean; error?: string }) => {
           if (response.error) {
+            console.error(
+              'Erreur lors de la mise à jour des filtres :',
+              response.error,
+            );
             setError(response.error);
+          } else {
+            console.log('Filtres mis à jour :', { category, difficulty });
           }
         },
       );
