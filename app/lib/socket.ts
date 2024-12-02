@@ -3,6 +3,10 @@
 import { io, Socket } from 'socket.io-client';
 import { getUserId } from './userId';
 
+interface Auth {
+  userId: string;
+}
+
 interface CustomSocket extends Socket {
   auth: Auth;
 }
