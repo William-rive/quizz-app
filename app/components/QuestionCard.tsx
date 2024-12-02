@@ -85,7 +85,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       <Card
         className="max-w-sm md:max-w-full px-2"
         style={{
-          borderColor: `hsl(${progress}, 100%, 50%)`, 
+          borderColor: `hsl(${progress}, 100%, 50%)`,
           borderWidth: '4px',
           borderStyle: 'solid',
         }}>
@@ -101,16 +101,15 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             {shuffledAnswers.map((answer, index) => (
               <li key={index}>
                 <Button
-                  variant={'outline'}
                   onClick={() => handleAnswer(answer)}
                   className={
                     selectedAnswer === answer
                       ? !timeUp
-                        ? 'bg-primary text-secondary' // Couleur temporaire après sélection
+                        ? 'bg-primary text-secondary'
                         : showResult
                           ? isCorrect
-                            ? 'bg-green-500 text-white' // Couleur si la réponse est correcte
-                            : 'bg-red-500 text-white' // Couleur si la réponse est incorrecte
+                            ? 'bg-green-500 text-white'
+                            : 'bg-red-500 text-white'
                           : ''
                       : ''
                   }>
